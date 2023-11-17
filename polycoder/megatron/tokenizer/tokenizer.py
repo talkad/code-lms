@@ -25,8 +25,8 @@ from tokenizers import Tokenizer
 from transformers import GPT2Tokenizer, GPT2TokenizerFast
 import numpy as np
 from typing import List, Union
-from .gpt2_tokenization import GPT2Tokenizer
-from .tokompiler.tokenizer import Tokompiler
+from gpt2_tokenization import GPT2Tokenizer
+from tokompiler.tokenizer import Tokompiler
 
 
 def build_tokenizer(args):
@@ -322,6 +322,12 @@ class TokompilerTokenizer(AbstractTokenizer):
 
     def detokenize(self, token_ids):
         return self.tokenizer.decode(token_ids)
+
+    def add_tokens(self, new_tokens):
+        return self.tokenizer.add_tokens(new_tokens)
+
+    def enable_padding(self, length):
+        self.tokenizer.enable_padding(length)
 
     @property
     def cls(self):

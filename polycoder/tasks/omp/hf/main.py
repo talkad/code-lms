@@ -1,59 +1,89 @@
 import os
 import argparse
-import torch
-from transformers import GPTNeoXForCausalLM, GPTNeoXConfig, AutoTokenizer
+from transformers import GPTNeoXForCausalLM
+from finetune_omp import finetune
+from test_omp import test
+import logging
+from prettytable import PrettyTable
+
 
 def main(args):
 
-    # Load Model
-    config = GPTNeoXConfig.from_pretrained(os.path.join(args.models_dir, args.model_name, 'config.json'))
-    model = GPTNeoXForCausalLM(config=config)
-    model.load_state_dict(torch.load(os.path.join(args.models_dir, args.model_name, 'pytorch_model.bin')))
-
-    model_dict = model.state_dict()
-    pretrained_dict = torch.load(os.path.join(args.models_dir, args.model_name, 'pytorch_model.bin'))
-
-    print(model_dict)
-    # Match layer names
-    # new_pretrained_dict = {}
-    # for k, v in pretrained_dict.items():
-    #     if k in model_dict:
-    #         print('ok', k)
-    #         new_pretrained_dict[k] = v
-    #     else:
-    #         print('no', k)
-
-    # Load modified state_dict
-    model.load_state_dict(new_pretrained_dict, strict=False)
-
-    print(f'----- model{args.model_name} loaded -----')
-
-    if args.task == 'train':
-        pass
-    else:
+    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))
+    
+    if args.do_finetune:
+        model.train()
+        finetune(args, model)
+    
+    if args.do_test:
         model.eval()
-        pass
+        test(args, model) 
 
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.register('type', 'bool', lambda v: v.lower() in ['yes', 'true', 't', '1', 'y'])
 
-    parser.add_argument('--task',
-                        default='train',
-                        choices=['train', 'test'],
-                        help='Specify the task (train or test)')
+    # Model arguments
+    parser.add_argument('--models_dir', help='Specify the directory for models')
+    parser.add_argument('--model_name', help='Specify the model name')
+    parser.add_argument('--do_finetune', action='store_true', help='Whether to finetune')
+    parser.add_argument('--do_test', action='store_true', help='Whether to test')
+    parser.add_argument('--device', default='cuda', choices=['cpu', 'cuda'], help='Specify the device (cpu or cuda)')
+    parser.add_argument('--logger', default='info.log', help='Set logger file name')
 
-    parser.add_argument('--models-dir',
-                        help='Specify the directory for models')
+    # Data arguments
+    parser.add_argument('-t', '--tokenizer_type', type=str, choices=['GPT2BPETokenizer', 'Tokompiler'], default='Tokompiler')
+    parser.add_argument('-v', '--vocab_file', type=str, default='../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json')
+    parser.add_argument('-m', '--merge_file', type=str, default='../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt')
+    parser.add_argument('-d', '--data_path', type=str, default=f'{os.path.expanduser("~")}/LIGHTBITS_SHARE/OMP_Dataset')
+    parser.add_argument('--data_device', default='cpu', choices=['cpu', 'gpu', 'mixed'])
+    parser.add_argument('--is_replaced', action='store_true')
+    parser.add_argument('--data_filename', type=str)
+    parser.add_argument('--save', type=bool, default=True)
 
-    parser.add_argument('--model-name',
-                        help='Specify the model name')
+    # The following arguments are leftover from megatron settings -- you can keep the defaults
+    parser.add_argument('--rank', type=int, default=0)
+    parser.add_argument('--make_vocab_size_divisible_by', type=int, default=128)
+    parser.add_argument('--model_parallel_size', type=int, default=1)
 
-    parser.add_argument('--device',
-                        default='cuda',
-                        choices=['cpu', 'cuda'],
-                        help='Specify the device (cpu or cuda)')
+    # Training args
+    parser.add_argument('--save_dir', type=str, default='outputs', help="Directory to save model checkpoints")
+    parser.add_argument('--batch_size', type=int, default=16, help="Big batch sizes are allowed (total #tokens per batch 262144)")
+    parser.add_argument('--lr', type=float, default=0.00016, help="Learning rate for the optimizer")
+    parser.add_argument('--warmup_steps', type=int, default=1600, help="Number of warmup steps")
+    parser.add_argument('--weight_decay', type=float, default=0, help="Weight decay for the optimizer")
+    parser.add_argument('--training_steps', type=int, default=100, help="Total number of training steps")
+    parser.add_argument('--num_epochs', type=int, default=5)
+    parser.add_argument('--adam_beta1', type=float, default=0.9, help="Beta1 for the Adam optimizer")
+    parser.add_argument('--adam_beta2', type=float, default=0.999, help="Beta2 for the Adam optimizer")
+    parser.add_argument('--adam_eps', type=float, default=1e-8, help="Epsilon for the Adam optimizer")
+
+
 
     main_args = parser.parse_args()
+
+    # Define a logger
+    logger = logging.getLogger()
+    logger.setLevel(level=logging.DEBUG)
+
+    console = logging.StreamHandler()
+    console.setLevel(level=logging.INFO)
+    logger.addHandler(console)
+
+    file = logging.FileHandler(os.path.join(main_args.logger))
+    file.setLevel(level=logging.DEBUG)
+    formatter = logging.Formatter('[%(asctime)s | %(filename)s | line %(lineno)d] - %(levelname)s: %(message)s')
+    file.setFormatter(formatter)
+    logger.addHandler(file)
+
+    # Logging configuration
+    config_table = PrettyTable()
+    config_table.field_names = ["Configuration", "Value"]
+    config_table.align["Configuration"] = "l"
+    config_table.align["Value"] = "l"
+    for config, value in vars(main_args).items():
+        config_table.add_row([config, str(value)])
+    logger.debug('Configurations:\n{}'.format(config_table))
+
     main(main_args)
