@@ -144,7 +144,9 @@ class _GPT2BPETokenizer(AbstractTokenizer):
 
         self.tokenizer = GPT2Tokenizer(vocab_file, merge_file, errors='replace',
                                        special_tokens=[], max_len=None)
+                                        
         self.eod_id = self.tokenizer.encoder['<|endoftext|>']
+        self.pad_id = 0 # -100 # self.tokenizer.encoder['<|padding|>']
 
     @property
     def vocab_size(self):
@@ -159,7 +161,7 @@ class _GPT2BPETokenizer(AbstractTokenizer):
         return self.tokenizer.decoder
 
     def tokenize(self, text):
-        return self.tokenizer.encode(text)
+        return self.tokenizer.encode(text) #, padding=True, )
 
     def detokenize(self, token_ids):
         return self.tokenizer.decode(token_ids)
@@ -237,7 +239,7 @@ class HFGPT2Tokenizer(AbstractTokenizer):
         return self.tokenizer._tokenizer.decoder
 
     def tokenize(self, text: str):
-        return self.tokenizer.encode(text)
+        return self.tokenizer.encode(text, padding=True)
 
     def tokenize_batch(self, text_batch: Union[List[str], str]):
         if isinstance(text_batch, str):
@@ -302,6 +304,8 @@ class TokompilerTokenizer(AbstractTokenizer):
         name = 'Tokompiler'
         super().__init__(name)
         self.tokenizer = Tokompiler(vocab_path)
+
+        self.pad_id = self.tokenizer.token_to_id('[PAD]')
 
     @property
     def vocab_size(self):

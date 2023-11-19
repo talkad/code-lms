@@ -33,7 +33,7 @@ if __name__=='__main__':
     parser.add_argument('--logger', default='info.log', help='Set logger file name')
 
     # Data arguments
-    parser.add_argument('-t', '--tokenizer_type', type=str, choices=['GPT2BPETokenizer', 'Tokompiler'], default='Tokompiler')
+    parser.add_argument('-t', '--tokenizer_type', type=str, choices=['GPT2BPETokenizer', 'Tokompiler', 'HFGPT2Tokenizer'], default='HFGPT2Tokenizer')
     parser.add_argument('-v', '--vocab_file', type=str, default='../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json')
     parser.add_argument('-m', '--merge_file', type=str, default='../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt')
     parser.add_argument('-d', '--data_path', type=str, default=f'{os.path.expanduser("~")}/LIGHTBITS_SHARE/OMP_Dataset')
@@ -49,7 +49,7 @@ if __name__=='__main__':
 
     # Training args
     parser.add_argument('--save_dir', type=str, default='outputs', help="Directory to save model checkpoints")
-    parser.add_argument('--batch_size', type=int, default=16, help="Big batch sizes are allowed (total #tokens per batch 262144)")
+    parser.add_argument('--batch_size', type=int, default=1, help="Big batch sizes are allowed (total #tokens per batch 262144)")
     parser.add_argument('--lr', type=float, default=0.00016, help="Learning rate for the optimizer")
     parser.add_argument('--warmup_steps', type=int, default=1600, help="Number of warmup steps")
     parser.add_argument('--weight_decay', type=float, default=0, help="Weight decay for the optimizer")

@@ -17,6 +17,30 @@ tokenizer.add_tokens(['private', 'reduction', 'simd'])
 tokenizer.enable_padding(length=252)
 
 
+def get_min_batch_metrics(model,batch,device,do_grads):
+    batch=(x.to(device) for x in batch)            
+    x,y,mask=batch
+    try:
+        logits = model(x,mask).logits
+    except Exception as e:
+        # print(mask)
+        # print(x)
+        raise e
+
+    num_preds = mask.sum()
+    y=y[mask]
+    logits=logits[mask]
+    
+    loss=F.cross_entropy(logits, y)
+    if do_grads:
+        loss.backward() 
+
+    preds=torch.argmax(logits,dim=-1) 
+    corect=(preds==y).sum()
+
+    return {'loss':loss,'num_preds':num_preds,'corect':corect}
+
+
 def preprocess_logits_for_metrics(logits, labels):
     logits = logits[0] 
 
@@ -49,13 +73,14 @@ def finetune(args, model):
     test_dataloader = DataLoader(test, batch_size=args.batch_size, shuffle=True)
 
     # update model embeddings
-    extended_tokens = ['private', 'reduction', 'simd']
+    if args.is_replaced:
+        extended_tokens = ['private', 'reduction', 'simd']
 
-    embedding_layer = model.get_input_embeddings()
-    num_embeddings = embedding_layer.weight.shape[0]
-    new_num_embeddings = num_embeddings+len(extended_tokens)
-    model.resize_token_embeddings(new_num_embeddings)
-    logger.info(f'Embedding layer has changed: {num_embeddings} -> {new_num_embeddings}')
+        embedding_layer = model.get_input_embeddings()
+        num_embeddings = embedding_layer.weight.shape[0]
+        new_num_embeddings = num_embeddings+len(extended_tokens)
+        model.resize_token_embeddings(new_num_embeddings)
+        logger.info(f'Embedding layer has changed: {num_embeddings} -> {new_num_embeddings}')
 
     # train
     optimizer = AdamW(model.parameters(), lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), eps=args.adam_eps,
@@ -67,64 +92,64 @@ def finetune(args, model):
     model.to(args.device)
     model.train()
 
-    # training_args = TrainingArguments(
-    #     output_dir=args.save_dir,
-    #     per_device_train_batch_size=args.batch_size,
-    #     num_train_epochs=float('inf'),
-    #     max_steps=args.training_steps,
-    #     # num_train_epochs=args.epochs,
-    #     # num_training_steps=args.training_steps,
-    #     save_strategy="epoch",
-    #     evaluation_strategy="epoch",
-    #     logging_dir='./logs',
-    #     eval_accumulation_steps=1,
-    # )
+    training_args = TrainingArguments(
+        output_dir=args.save_dir,
+        per_device_train_batch_size=args.batch_size,
+        num_train_epochs=float('inf'),
+        max_steps=args.training_steps,
+        # num_train_epochs=args.epochs,
+        # num_training_steps=args.training_steps,
+        # save_strategy="epoch",
+        evaluation_strategy="epoch",
+        logging_dir='./logs',
+        eval_accumulation_steps=1,
+    )
 
-    # trainer = Trainer(
-    #     model=model,
-    #     args=training_args,
-    #     train_dataset=train_dataloader,
-    #     eval_dataset=test_dataloader,
-    #     compute_metrics=compute_metrics,
-    #     preprocess_logits_for_metrics=preprocess_logits_for_metrics,
-    #     optimizers=(optimizer, scheduler)
-    # )
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=train,
+        eval_dataset=test,
+        compute_metrics=compute_metrics,
+        preprocess_logits_for_metrics=preprocess_logits_for_metrics,
+        optimizers=(optimizer, scheduler)
+    )
 
-    # trainer.train()
-    # # trainer.evaluate()
+    trainer.train()
+    # trainer.evaluate()
 
 
-
-    
-
-    progress_bar = tqdm(range(args.num_epochs * len(train_dataloader)))
-
-    running_loss = 0.0  # Variable to accumulate the loss
-    batches_to_print = 500  # Number of batches after which to print the mean loss
 
     
-    for epoch in range(args.num_epochs):
-        for batch_idx, batch in enumerate(train_dataloader):
-            # import pdb; pdb.set_trace()
-            tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels']}
-            outputs = model(**tensor_batch)
-            loss = outputs.loss
-            loss.backward()
 
-            optimizer.step()
-            scheduler.step()
-            optimizer.zero_grad()
+    # progress_bar = tqdm(range(args.num_epochs * len(train_dataloader)))
 
-            running_loss += loss.item()
+    # running_loss = 0.0  # Variable to accumulate the loss
+    # batches_to_print = 500  # Number of batches after which to print the mean loss
 
-            if (batch_idx + 1) % batches_to_print == 0:
-                mean_loss = running_loss / batches_to_print
-                print(f'Epoch {epoch + 1}, Batch {batch_idx + 1}/{len(train_dataloader)}, Mean Loss: {mean_loss:.4f}')
-                running_loss = 0.0  # Reset running loss
+    
+    # for epoch in range(args.num_epochs):
+    #     for batch_idx, batch in enumerate(train_dataloader):
+    #         # import pdb; pdb.set_trace()
+    #         tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels']}
+    #         outputs = model(**tensor_batch)
+    #         loss = outputs.loss
+    #         loss.backward()
+
+    #         optimizer.step()
+    #         scheduler.step()
+    #         optimizer.zero_grad()
+
+    #         running_loss += loss.item()
+
+    #         if (batch_idx + 1) % batches_to_print == 0:
+    #             mean_loss = running_loss / batches_to_print
+    #             print(f'Epoch {epoch + 1}, Batch {batch_idx + 1}/{len(train_dataloader)}, Mean Loss: {mean_loss:.4f}')
+    #             running_loss = 0.0  # Reset running loss
                 
-                preds = torch.argmax(outputs['logits'][0], dim=-1)
-                preds[preds > 1189] = 4
-                logger.info(f"{batch['code'][0]}\n{tokenizer.detokenize(batch['labels'][0].tolist())}\n{tokenizer.detokenize(preds.tolist())}")
+    #             preds = torch.argmax(outputs['logits'][0], dim=-1)
+    #             preds[preds > 1189] = 4
+    #             logger.info(f"{batch['code'][0]}\n{tokenizer.detokenize(batch['labels'][0].tolist())}\n{tokenizer.detokenize(preds.tolist())}")
 
-            progress_bar.update(1)
+    #         progress_bar.update(1)
 

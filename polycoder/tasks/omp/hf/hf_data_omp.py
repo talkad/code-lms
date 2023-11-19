@@ -5,9 +5,12 @@ import datasets as trd
 from datasets import Sequence, Value
 import numpy
 import torch
+import copy
 
 sys.path.append("/mnt/lbosm1/home/Share/code-lms/polycoder/tasks/tokenizer")
 from tokompiler.lexicalization import lexicalize
+
+
 
 
 def pragma2dict(pragma):
@@ -51,6 +54,7 @@ def build_omp_dataset(args, rebuild=False):
 
         if args.tokenizer_type.lower() == 'GPT2BPETokenizer'.lower():
             eos_token = tokenizer.eod_id
+
         elif args.tokenizer_type.lower() == 'Tokompiler'.lower():
             eos_token = tokenizer.eod
 
@@ -71,7 +75,10 @@ def build_omp_dataset(args, rebuild=False):
                              split=['train[0%:80%]', 'train[80%:90%]', 'train[90%:100%]'])
         d = trd.DatasetDict({'train': d[0], 'validation': d[1], 'test': d[2]})
 
+        
+
         def tokenize_and_parse(example, eos_token=eos_token):
+            import pdb; pdb.set_trace()
             code = lexicalize(example["code"], replaced=args.is_replaced)
             pragma = example["pragma"]
 
@@ -83,11 +90,30 @@ def build_omp_dataset(args, rebuild=False):
                 pragma = pragma.replace('_', ' ')
             #########################
 
-            tmp = f'{code} [SEP] {pragma}'
-            example["input_ids"] = tokenizer.tokenize(f'{code} [SOS] ')[0]
-            example["labels"] = tokenizer.tokenize(f'{pragma} [EOS] ')[0]
+            sep = '[SEP]'
+            if not args.is_replaced:
+                sep = '\n'
+            # example["input_ids"] = tokenizer.tokenize(f'{code} [SEP] ')#[0]
+            # example["labels"] = tokenizer.tokenize(f' {pragma} [EOS] ')#[0]
 
-            # example["input_ids"] = tokenizer.tokenize(tmp)[0] + [eos_token]
+            code = tokenizer.tokenize(code)
+            pragma = tokenizer.tokenize(f'{sep} {pragma}')
+
+            full =  code + pragma + [eos_token]
+
+            example["input_ids"] = full
+
+            max_length = 128
+            example["input_ids"] = example["input_ids"][:max_length]
+            example["input_ids"] += (max_length - len(example["input_ids"])) * [tokenizer.pad_id]
+
+            labels = example["input_ids"].copy()
+            # labels = [-100 if token_id == tokenizer.pad else token_id for token_id in labels]
+            example["labels"] = labels
+
+            # insert attention mask 
+            example["mask"] = [0] * len(code) + [1] * len(pragma) + [0] * (max_length - len(code) - len(pragma))
+
             example["length"] = len(example["input_ids"])
             return example
 
