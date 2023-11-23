@@ -8,16 +8,15 @@ from prettytable import PrettyTable
 
 
 def main(args):
-
-    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))
     
     if args.do_finetune:
+        model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))
         model.train()
+
         finetune(args, model)
     
     if args.do_test:
-        model.eval()
-        test(args, model) 
+        test(args) 
 
 
 if __name__=='__main__':
@@ -49,12 +48,12 @@ if __name__=='__main__':
 
     # Training args
     parser.add_argument('--save_dir', type=str, default='outputs', help="Directory to save model checkpoints")
-    parser.add_argument('--batch_size', type=int, default=1, help="Big batch sizes are allowed (total #tokens per batch 262144)")
+    parser.add_argument('--batch_size', type=int, default=16, help="Big batch sizes are allowed (total #tokens per batch 262144)")
     parser.add_argument('--lr', type=float, default=0.00016, help="Learning rate for the optimizer")
     parser.add_argument('--warmup_steps', type=int, default=1600, help="Number of warmup steps")
     parser.add_argument('--weight_decay', type=float, default=0, help="Weight decay for the optimizer")
     parser.add_argument('--training_steps', type=int, default=100, help="Total number of training steps")
-    parser.add_argument('--num_epochs', type=int, default=5)
+    parser.add_argument('--num_epochs', type=int, default=1)
     parser.add_argument('--adam_beta1', type=float, default=0.9, help="Beta1 for the Adam optimizer")
     parser.add_argument('--adam_beta2', type=float, default=0.999, help="Beta2 for the Adam optimizer")
     parser.add_argument('--adam_eps', type=float, default=1e-8, help="Epsilon for the Adam optimizer")

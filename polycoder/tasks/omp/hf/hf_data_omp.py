@@ -59,7 +59,7 @@ def build_omp_dataset(args, rebuild=False):
             eos_token = tokenizer.eod
 
             tokenizer.add_tokens(['private', 'reduction', 'simd'])
-            tokenizer.enable_padding(length=256)
+            # tokenizer.enable_padding(length=512)
 
         else:
             raise NotImplementedError(f"We do not support the tokenizer type {args.tokenizer_type}")
@@ -72,38 +72,45 @@ def build_omp_dataset(args, rebuild=False):
 
         dpath = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', args.data_filename)
         d = trd.load_dataset('json', data_files=[dpath], features=feature_types,
-                             split=['train[0%:80%]', 'train[80%:90%]', 'train[90%:100%]'])
+                             split=['train[0%:90%]', 'train[90%:91%]', 'train[91%:100%]'])
         d = trd.DatasetDict({'train': d[0], 'validation': d[1], 'test': d[2]})
 
         
 
         def tokenize_and_parse(example, eos_token=eos_token):
-            import pdb; pdb.set_trace()
             code = lexicalize(example["code"], replaced=args.is_replaced)
             pragma = example["pragma"]
 
             ### Simplified pragma ###
             pragma_dict = pragma2dict(pragma)
-            pragma = f"private {' '.join(pragma_dict['private']['vars']) if 'private' in pragma_dict else ''} || reduction {pragma_dict['reduction']['operator'] + ' : ' + ' '.join(pragma_dict['reduction']['vars']) if 'reduction' in pragma_dict else ''} "
+            pragma = f"for {'|| private' if 'private' in pragma_dict else ''} {' '.join(pragma_dict['private']['vars']) if 'private' in pragma_dict else ''} {'|| reduction' if 'reduction' in pragma_dict else ''} {pragma_dict['reduction']['operator'] + ' : ' + ' '.join(pragma_dict['reduction']['vars']) if 'reduction' in pragma_dict else ''} "
 
-            if args.is_replaced:
-                pragma = pragma.replace('_', ' ')
             #########################
 
-            sep = '[SEP]'
-            if not args.is_replaced:
-                sep = '\n'
+            if args.is_replaced:
+                pragma = pragma.replace('_', ' ').replace('(', ' ( ').replace(')', ' ) ')
+
+            # start_token = 'aaa'
+            # if args.is_replaced:
+            #     start_token = '[SOS]'
+
+            # sep = '[SEP]'
+            # if not args.is_replaced:
+            #     sep = '\n'
             # example["input_ids"] = tokenizer.tokenize(f'{code} [SEP] ')#[0]
             # example["labels"] = tokenizer.tokenize(f' {pragma} [EOS] ')#[0]
 
-            code = tokenizer.tokenize(code)
-            pragma = tokenizer.tokenize(f'{sep} {pragma}')
+            code, _ = tokenizer.tokenize(code)
+            # pragma, _ = tokenizer.tokenize(f'{start_token} {pragma}')
+            pragma, _ = tokenizer.tokenize(f'{pragma}')
 
-            full =  code + pragma + [eos_token]
+            assert args.is_replaced # only tokompiler
+
+            full =  code + [2] + pragma + [eos_token]  
 
             example["input_ids"] = full
 
-            max_length = 128
+            max_length = 512
             example["input_ids"] = example["input_ids"][:max_length]
             example["input_ids"] += (max_length - len(example["input_ids"])) * [tokenizer.pad_id]
 
@@ -112,9 +119,14 @@ def build_omp_dataset(args, rebuild=False):
             example["labels"] = labels
 
             # insert attention mask 
-            example["mask"] = [0] * len(code) + [1] * len(pragma) + [0] * (max_length - len(code) - len(pragma))
+            example["mask"] = [0] * len(code) + [1] * (len(pragma)+2) + [0] * (max_length - len(code) - len(pragma)-2)
+            example["mask"] = example["mask"][:max_length]
 
             example["length"] = len(example["input_ids"])
+
+            assert len(example["input_ids"]) == max_length
+            assert len(example["mask"]) == max_length
+
             return example
 
         # JSON fields are:
@@ -125,7 +137,7 @@ def build_omp_dataset(args, rebuild=False):
         tokenized_dataset = d.map(tokenize_and_parse, batched=False)
 
         tokenized_dataset.set_format(type="torch",
-                                     columns=['input_ids', 'labels'],
+                                     columns=['input_ids', 'labels', 'mask'],
                                      output_all_columns=True)
         if args.save:
             tokenized_dataset.save_to_disk(args.data_path)
