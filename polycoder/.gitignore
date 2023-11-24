@@ -154,3 +154,4 @@ test_logs/
 logs/
 tensorboard/
 src/
+**/outputs

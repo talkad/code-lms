@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python main.py      --do_finetune                                                       \
+python main.py      --do_test                                                       \
                     --models_dir /home/talkad/shared/models/hf_checkpoints              \
                     --model_name allc_tokom_700M                                        \
                     --device cuda                                                       \

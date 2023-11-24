@@ -13,6 +13,12 @@ def main(args):
         model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))
         model.train()
 
+        # freeze base weights
+        # for name, param in model.named_parameters():
+        #     if name.startswith('gpt_neox.layers.') and name[len('gpt_neox.layers.')] in [0,1,2]:
+        #         param.requires_grad = False
+        #         print(name, param.requires_grad)
+
         finetune(args, model)
     
     if args.do_test:
@@ -49,8 +55,8 @@ if __name__=='__main__':
     # Training args
     parser.add_argument('--save_dir', type=str, default='outputs', help="Directory to save model checkpoints")
     parser.add_argument('--batch_size', type=int, default=16, help="Big batch sizes are allowed (total #tokens per batch 262144)")
-    parser.add_argument('--lr', type=float, default=0.00016, help="Learning rate for the optimizer")
-    parser.add_argument('--warmup_steps', type=int, default=1600, help="Number of warmup steps")
+    parser.add_argument('--lr', type=float, default=0.0001, help="Learning rate for the optimizer")
+    parser.add_argument('--warmup_steps', type=int, default=400, help="Number of warmup steps")
     parser.add_argument('--weight_decay', type=float, default=0, help="Weight decay for the optimizer")
     parser.add_argument('--training_steps', type=int, default=100, help="Total number of training steps")
     parser.add_argument('--num_epochs', type=int, default=1)

@@ -44,7 +44,7 @@ def test(args):
     train, val, test = data_omp.build_omp_dataset(args)
     test_dataloader = DataLoader(test, batch_size=1, shuffle=True)
 
-    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, 'poly_tokom'))
+    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, 'poly_tokom_attention'))
 
     model.to(args.device)
     model.eval()
@@ -75,6 +75,6 @@ def test(args):
        
         progress_bar.update(1)
 
-    with open('poly_tokom.log', 'w') as f:
+    with open('poly_tokom_attention.log', 'w') as f:
         f.write(str(pred_table))
 
