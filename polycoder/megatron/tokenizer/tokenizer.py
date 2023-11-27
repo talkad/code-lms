@@ -146,7 +146,7 @@ class _GPT2BPETokenizer(AbstractTokenizer):
                                        special_tokens=[], max_len=None)
                                         
         self.eod_id = self.tokenizer.encoder['<|endoftext|>']
-        self.pad_id = 0 # -100 # self.tokenizer.encoder['<|padding|>']
+        self.pad_id = 0 # -100
 
     @property
     def vocab_size(self):

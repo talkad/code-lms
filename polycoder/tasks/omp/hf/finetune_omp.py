@@ -13,15 +13,6 @@ logger = logging.getLogger()
 
 
 def calculate_metrics(logits, labels, mask):
-    # import pdb; pdb.set_trace()
-    # TODO: add PPL xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    # TODO: evaluate with GPT 3.5 turbo
-
-    # 1. hyper param v / attention tuning v / PPL v /
-    # 2. BPE 
-    # 3. GPT3.5 (Pragformers question) - test only
-    # 4. tokom preprocess
-
     y = labels[mask==1][1:]
     logits = logits[mask==1][:-1]
 
@@ -38,13 +29,11 @@ def calculate_metrics(logits, labels, mask):
 
 
 def finetune(args, model):
-    logger.info('start finetune')
+    logger.info(f'start finetune {args.model_name}')
 
     # get data
-    train, val, test = data_omp.build_omp_dataset(args)
+    train, test = data_omp.build_omp_dataset(args)
     train_dataloader = DataLoader(train, batch_size=args.batch_size, shuffle=True)
-    val_dataloader = DataLoader(val, batch_size=args.batch_size, shuffle=True)
-    test_dataloader = DataLoader(test, batch_size=args.batch_size, shuffle=True)
 
     # update model embeddings
     if args.is_replaced:
@@ -62,10 +51,7 @@ def finetune(args, model):
                                                                    num_training_steps=args.training_steps)
 
     model.to(args.device)
-    
-    # model = torch.nn.DataParallel(model, device_ids=[0, 1])
     model.train()
-
 
     # TRAIN
     progress_bar = tqdm(range(args.num_epochs * len(train_dataloader)))
@@ -78,14 +64,6 @@ def finetune(args, model):
         for batch_idx, batch in enumerate(train_dataloader):
             # import pdb; pdb.set_trace()
             tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask']}
-
-            # ##### TRY ATTENTION #####
-            # index_of_one = (tensor_batch['mask'] == 1).nonzero(as_tuple=True)[0]
-
-            # attention_mask = torch.zeros_like(tensor_batch['mask'])
-            # if len(index_of_one) > 0:
-            #     attention_mask[:index_of_one[0]] = 1
-            # #########################
 
             outputs = model(input_ids=tensor_batch['input_ids'])
             logits = outputs.logits
@@ -110,5 +88,5 @@ def finetune(args, model):
 
             progress_bar.update(1)
 
-    model.save_pretrained(os.path.join(args.save_dir, 'poly_tokom_attention'), from_pt=True) 
+    model.save_pretrained(os.path.join(args.save_dir, 'poly_bpe'), from_pt=True) 
 

@@ -13,12 +13,6 @@ def main(args):
         model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))
         model.train()
 
-        # freeze base weights
-        # for name, param in model.named_parameters():
-        #     if name.startswith('gpt_neox.layers.') and name[len('gpt_neox.layers.')] in [0,1,2]:
-        #         param.requires_grad = False
-        #         print(name, param.requires_grad)
-
         finetune(args, model)
     
     if args.do_test:

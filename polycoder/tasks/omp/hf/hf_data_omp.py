@@ -6,10 +6,10 @@ from datasets import Sequence, Value
 import numpy
 import torch
 import copy
+import json
 
-sys.path.append("/mnt/lbosm1/home/Share/code-lms/polycoder/tasks/tokenizer")
+sys.path.append("../../tokenizer")
 from tokompiler.lexicalization import lexicalize
-
 
 
 
@@ -43,6 +43,12 @@ def pragma2dict(pragma):
     return result
 
 
+def read_jsonl(file_path):
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+    return [json.loads(line.strip()) for line in lines]
+
+
 def build_omp_dataset(args, rebuild=False):
     if (not rebuild) and os.path.exists(os.path.join(args.data_path, "test/data.arrow")):
         # Load the already constructed dataset
@@ -59,7 +65,6 @@ def build_omp_dataset(args, rebuild=False):
             eos_token = tokenizer.eod
 
             tokenizer.add_tokens(['private', 'reduction', 'simd'])
-            # tokenizer.enable_padding(length=512)
 
         else:
             raise NotImplementedError(f"We do not support the tokenizer type {args.tokenizer_type}")
@@ -70,43 +75,54 @@ def build_omp_dataset(args, rebuild=False):
             "hash": Value("string"),
         })
 
-        dpath = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', args.data_filename)
-        d = trd.load_dataset('json', data_files=[dpath], features=feature_types,
-                             split=['train[0%:90%]', 'train[90%:91%]', 'train[91%:100%]'])
-        d = trd.DatasetDict({'train': d[0], 'validation': d[1], 'test': d[2]})
+        train_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'train.jsonl')
+        test_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'test.jsonl')
 
+        train_dataset = read_jsonl(train_data_path)
+        test_dataset = read_jsonl(test_data_path)
+
+        columns = train_dataset[0].keys()
+        train_dataset = trd.Dataset.from_dict({col: [item[col] for item in train_dataset] for col in columns})
+        test_dataset = trd.Dataset.from_dict({col: [item[col] for item in test_dataset] for col in columns})
+
+        d = trd.DatasetDict({'train': train_dataset, 'test': test_dataset})
         
 
         def tokenize_and_parse(example, eos_token=eos_token):
+            # import pdb; pdb.set_trace()
             code = lexicalize(example["code"], replaced=args.is_replaced)
             pragma = example["pragma"]
 
-            ### Simplified pragma ###
-            pragma_dict = pragma2dict(pragma)
-            pragma = f"for {'|| private' if 'private' in pragma_dict else ''} {' '.join(pragma_dict['private']['vars']) if 'private' in pragma_dict else ''} {'|| reduction' if 'reduction' in pragma_dict else ''} {pragma_dict['reduction']['operator'] + ' : ' + ' '.join(pragma_dict['reduction']['vars']) if 'reduction' in pragma_dict else ''} "
+            # ### Simplified pragma ###
+            # pragma_dict = pragma2dict(pragma)
+            # pragma = f"for {'|| private' if 'private' in pragma_dict else ''} {' '.join(pragma_dict['private']['vars']) if 'private' in pragma_dict else ''} {'|| reduction' if 'reduction' in pragma_dict else ''} {pragma_dict['reduction']['operator'] + ' : ' + ' '.join(pragma_dict['reduction']['vars']) if 'reduction' in pragma_dict else ''} "
 
+            # #########################
+
+            ### Data Preproccess ###
+            pragma = pragma[pragma.find('for'):]
+            pragma = pragma.replace('parallel', '')
+            pragma = pragma.replace('(', ' ( ').replace(')', ' ) ').replace(':', ' : ').replace(',', ' , ')
+
+            if args.is_replaced:
+                pragma = pragma.replace('_', ' ')
             #########################
 
             if args.is_replaced:
-                pragma = pragma.replace('_', ' ').replace('(', ' ( ').replace(')', ' ) ')
+                sep_id, _ = tokenizer.tokenize('[SEP]')
+                sep_id = sep_id[0]
+                eos_id = tokenizer.eod
 
-            # start_token = 'aaa'
-            # if args.is_replaced:
-            #     start_token = '[SOS]'
+                code, _ = tokenizer.tokenize(code)
+                pragma, _ = tokenizer.tokenize(pragma)
+            else:
+                sep_id = tokenizer.tokenize('\n')[0]
+                eos_id = tokenizer.eod_id
 
-            # sep = '[SEP]'
-            # if not args.is_replaced:
-            #     sep = '\n'
-            # example["input_ids"] = tokenizer.tokenize(f'{code} [SEP] ')#[0]
-            # example["labels"] = tokenizer.tokenize(f' {pragma} [EOS] ')#[0]
+                code = tokenizer.tokenize(code)
+                pragma = tokenizer.tokenize(f'{pragma}')
 
-            code, _ = tokenizer.tokenize(code)
-            # pragma, _ = tokenizer.tokenize(f'{start_token} {pragma}')
-            pragma, _ = tokenizer.tokenize(f'{pragma}')
-
-            assert args.is_replaced # only tokompiler
-
-            full =  code + [2] + pragma + [eos_token]  
+            full =  code + [sep_id] + pragma + [eos_id]  
 
             example["input_ids"] = full
 
@@ -115,17 +131,14 @@ def build_omp_dataset(args, rebuild=False):
             example["input_ids"] += (max_length - len(example["input_ids"])) * [tokenizer.pad_id]
 
             labels = example["input_ids"].copy()
-            # labels = [-100 if token_id == tokenizer.pad else token_id for token_id in labels]
             example["labels"] = labels
 
-            # insert attention mask 
             example["mask"] = [0] * len(code) + [1] * (len(pragma)+2) + [0] * (max_length - len(code) - len(pragma)-2)
             example["mask"] = example["mask"][:max_length]
 
             example["length"] = len(example["input_ids"])
 
-            assert len(example["input_ids"]) == max_length
-            assert len(example["mask"]) == max_length
+            assert len(example["input_ids"]) == max_length and len(example["mask"]) == max_length
 
             return example
 
@@ -142,7 +155,7 @@ def build_omp_dataset(args, rebuild=False):
         if args.save:
             tokenized_dataset.save_to_disk(args.data_path)
 
-    return tokenized_dataset["train"], tokenized_dataset["validation"], tokenized_dataset["test"]
+    return tokenized_dataset["train"], tokenized_dataset["test"]
 
 
 

@@ -40,9 +40,8 @@ def concat_vars(pragma):
 def test(args):
     logger.info('start test')
 
-    # get data
-    train, val, test = data_omp.build_omp_dataset(args)
-    test_dataloader = DataLoader(test, batch_size=1, shuffle=True)
+    train, test = data_omp.build_omp_dataset(args)
+    test_dataloader = DataLoader(test, batch_size=1)
 
     model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, 'poly_tokom_attention'))
 

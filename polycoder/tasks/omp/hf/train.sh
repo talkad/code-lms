@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python main.py      --do_test                                                       \
+python main.py      --do_finetune                                                       \
                     --models_dir /home/talkad/shared/models/hf_checkpoints              \
                     --model_name allc_tokom_700M                                        \
                     --device cuda                                                       \
@@ -11,4 +11,3 @@ python main.py      --do_test                                                   
                     --logger debug.log
 
 
-                                        # --vocab_file /mnt/lbosm1/home/Share/code-lms/polycoder/tasks/tokenizer/tokompiler/tokenizer_vocab/vocab.txt \
