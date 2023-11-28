@@ -6,9 +6,6 @@ import numpy as np
 import torch
 import re
 
-from megatron import mpu, print_rank_0
-from megatron.data.data_utils import make_data_loader
-
 
 def unwrap_lists(list_data, data_type=torch.Tensor):
     # Handle possibly nested lists.
@@ -22,6 +19,7 @@ def unwrap_lists(list_data, data_type=torch.Tensor):
 
 
 def broadcast_data_list(keys, data, is_tensor=True, data_type=torch.Tensor):
+    from megatron import mpu, print_rank_0
     """Broadcast data from rank zero of each model parallel group to the
         members of the same model parallel group.
 
@@ -135,6 +133,8 @@ class SeqLengthSampler(torch.utils.data.Sampler):
 def make_data_loader_with_padding(dataset, neox_args, seq_length_bins=None, drop_last=True, shuffle=True):
     """Build dataloader given an input dataset. Minor modification of megatron.data.data_utils"""
     from megatron.data.samplers import DistributedBatchSampler
+    from megatron import mpu, print_rank_0
+    from megatron.data.data_utils import make_data_loader
 
     if dataset is None:
         return None
@@ -183,6 +183,7 @@ def make_data_loader_with_padding(dataset, neox_args, seq_length_bins=None, drop
 
 
 def build_dataloaders(neox_args, get_dataset_fn, pad_sequences=False, length_bins=None, drop_last=True, shuffle=True):
+    from megatron import mpu, print_rank_0
     (train_dataloader, valid_dataloader, test_dataloader) = (None, None, None)
 
     print_rank_0('> building train, validation, and test datasets ...')
