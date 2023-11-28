@@ -96,7 +96,6 @@ def build_omp_dataset(args, rebuild=False):
             # ### Simplified pragma ###
             # pragma_dict = pragma2dict(pragma)
             # pragma = f"for {'|| private' if 'private' in pragma_dict else ''} {' '.join(pragma_dict['private']['vars']) if 'private' in pragma_dict else ''} {'|| reduction' if 'reduction' in pragma_dict else ''} {pragma_dict['reduction']['operator'] + ' : ' + ' '.join(pragma_dict['reduction']['vars']) if 'reduction' in pragma_dict else ''} "
-
             # #########################
 
             ### Data Preproccess ###
@@ -122,7 +121,10 @@ def build_omp_dataset(args, rebuild=False):
                 code = tokenizer.tokenize(code)
                 pragma = tokenizer.tokenize(f'{pragma}')
 
-            full =  code + [sep_id] + pragma + [eos_id]  
+            if args.do_eval: # for PPL evaluation only the code is used without the pragma
+                full = code + [eos_id]
+            else:
+                full =  code + [sep_id] + pragma + [eos_id]  
 
             example["input_ids"] = full
 

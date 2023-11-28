@@ -9,16 +9,13 @@ from torch.nn.functional import cross_entropy, one_hot
 from torch.utils.data import DataLoader
 from transformers import GPTNeoXForCausalLM
 from prettytable import PrettyTable
+from tokenizer import TokompilerTokenizer, _GPT2BPETokenizer
 
 
 
 logger = logging.getLogger()
 
 
-from tokenizer import TokompilerTokenizer
-tokenizer = TokompilerTokenizer(vocab_path='/mnt/lbosm1/home/Share/code-lms/polycoder/tasks/tokenizer/tokompiler/tokenizer_vocab/vocab.txt')
-tokenizer.add_tokens(['private', 'reduction', 'simd'])
-tokenizer.enable_padding(length=252)
 
 
 def concat_vars(pragma):
@@ -43,10 +40,26 @@ def test(args):
     train, test = data_omp.build_omp_dataset(args)
     test_dataloader = DataLoader(test, batch_size=1)
 
-    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, 'poly_tokom_attention'))
+    # get model
+    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, 'poly_bpe'))
 
     model.to(args.device)
     model.eval()
+
+    # set tokenizer
+    if args.is_replaced:
+        logger.info("set tokompiler tokenizer")
+        tokenizer = TokompilerTokenizer(vocab_path='/mnt/lbosm1/home/Share/code-lms/polycoder/tasks/tokenizer/tokompiler/tokenizer_vocab/vocab.txt')
+        tokenizer.add_tokens(['private', 'reduction', 'simd'])
+        tokenizer.enable_padding(length=252)
+    else:
+        logger.info("set BPE tokenizer")
+
+        if args.vocab_file is None:
+            lgger.info("WARNING: No vocab file found, loading Huggingface's pretrained GPT2Tokenizer")
+        tokenizer = _GPT2BPETokenizer(args.vocab_file, args.merge_file)
+
+
 
     progress_bar = tqdm(range(len(test_dataloader)))
 

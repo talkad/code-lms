@@ -7,6 +7,8 @@ from transformers import get_cosine_with_hard_restarts_schedule_with_warmup, Tra
 from tqdm.auto import tqdm
 from torch.nn.functional import cross_entropy, one_hot
 from torch.utils.data import DataLoader
+from transformers import GPTNeoXForCausalLM
+
 
 
 logger = logging.getLogger()
@@ -16,7 +18,7 @@ def calculate_metrics(logits, labels, mask):
     y = labels[mask==1][1:]
     logits = logits[mask==1][:-1]
 
-    ce_loss = cross_entropy(logits, one_hot(y, num_classes=logits.shape[-1]).to(torch.float32))
+    ce_loss = cross_entropy(logits, one_hot(y, num_classes=logits.shape[-1]).to(torch.float32), reduction='mean')
 
     preds = torch.argmax(logits,dim=-1) 
     accuracy = (preds==y).to(torch.float32).mean()
@@ -28,12 +30,26 @@ def calculate_metrics(logits, labels, mask):
 
 
 
-def finetune(args, model):
+def finetune(args):
     logger.info(f'start finetune {args.model_name}')
+
 
     # get data
     train, test = data_omp.build_omp_dataset(args)
     train_dataloader = DataLoader(train, batch_size=args.batch_size, shuffle=True)
+   
+    # get model
+    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))        
+    model.train()
+
+    # freeze parameters model
+    freeze_layers = list(range(0, 6))
+    for name, param in model.named_parameters():
+        if any([f'layers.{layer}' in name for layer in freeze_layers]):      
+            param.requires_grad = False
+
+    for name, param in model.named_parameters():
+        logger.info(f'param: {name} grad is {param.requires_grad}')
 
     # update model embeddings
     if args.is_replaced:
@@ -57,9 +73,8 @@ def finetune(args, model):
     progress_bar = tqdm(range(args.num_epochs * len(train_dataloader)))
 
     running_loss, running_acc, running_ppl = 0.0, 0.0, 0.0
-    batches_to_print = 50 
+    batches_to_print = 100
 
-    
     for epoch in range(args.num_epochs):
         for batch_idx, batch in enumerate(train_dataloader):
             # import pdb; pdb.set_trace()
@@ -88,5 +103,5 @@ def finetune(args, model):
 
             progress_bar.update(1)
 
-    model.save_pretrained(os.path.join(args.save_dir, 'poly_bpe'), from_pt=True) 
+    model.save_pretrained(os.path.join(args.save_dir, 'poly_bpe_freeze-0-5'), from_pt=True) 
 

@@ -1,8 +1,8 @@
 import os
 import argparse
-from transformers import GPTNeoXForCausalLM
 from finetune_omp import finetune
 from test_omp import test
+from compcoder_eval import eval
 import logging
 from prettytable import PrettyTable
 
@@ -10,10 +10,10 @@ from prettytable import PrettyTable
 def main(args):
     
     if args.do_finetune:
-        model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))
-        model.train()
+        finetune(args)
 
-        finetune(args, model)
+    if args.do_eval:
+        eval(args)
     
     if args.do_test:
         test(args) 
@@ -27,6 +27,7 @@ if __name__=='__main__':
     parser.add_argument('--models_dir', help='Specify the directory for models')
     parser.add_argument('--model_name', help='Specify the model name')
     parser.add_argument('--do_finetune', action='store_true', help='Whether to finetune')
+    parser.add_argument('--do_eval', action='store_true', help='Whether to evaluation')
     parser.add_argument('--do_test', action='store_true', help='Whether to test')
     parser.add_argument('--device', default='cuda', choices=['cpu', 'cuda'], help='Specify the device (cpu or cuda)')
     parser.add_argument('--logger', default='info.log', help='Set logger file name')
@@ -53,12 +54,10 @@ if __name__=='__main__':
     parser.add_argument('--warmup_steps', type=int, default=400, help="Number of warmup steps")
     parser.add_argument('--weight_decay', type=float, default=0, help="Weight decay for the optimizer")
     parser.add_argument('--training_steps', type=int, default=100, help="Total number of training steps")
-    parser.add_argument('--num_epochs', type=int, default=1)
+    parser.add_argument('--num_epochs', type=int, default=2)
     parser.add_argument('--adam_beta1', type=float, default=0.9, help="Beta1 for the Adam optimizer")
     parser.add_argument('--adam_beta2', type=float, default=0.999, help="Beta2 for the Adam optimizer")
     parser.add_argument('--adam_eps', type=float, default=1e-8, help="Epsilon for the Adam optimizer")
-
-
 
     main_args = parser.parse_args()
 
