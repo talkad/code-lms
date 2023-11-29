@@ -41,7 +41,7 @@ def test(args):
     test_dataloader = DataLoader(test, batch_size=1)
 
     # get model
-    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, 'poly_bpe'))
+    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, 'poly_bpe_vy'))
 
     model.to(args.device)
     model.eval()
@@ -72,21 +72,26 @@ def test(args):
     for batch_idx, batch in enumerate(test_dataloader):
         # import pdb; pdb.set_trace()
         tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask']}
-        mask = tensor_batch['mask']
-        labels = tensor_batch['labels']
+        # mask = tensor_batch['mask']
+        # labels = tensor_batch['labels']
         outputs = model(input_ids=tensor_batch['input_ids'])
         logits = outputs.logits
 
-        labels = labels[mask==1][1:-1]
-        logits = logits[mask==1][:-2]
-        preds = torch.argmax(logits,dim=-1) 
+        # logits = logits[mask==1][:-2]
+        preds = torch.argmax(logits,dim=-1)
+        preds = preds[preds!=50256]
 
-        pred_table.add_row([concat_vars(tokenizer.detokenize(labels.tolist())), 
-                            concat_vars(tokenizer.detokenize(preds.tolist()))])
+        try:
+            pred = tokenizer.detokenize(preds.tolist())
+        except:
+            pred = ''
+
+        pred_table.add_row([batch['pragma'][0], 
+                            pred[pred.rfind('\n')+1:]])
 
        
         progress_bar.update(1)
 
-    with open('poly_tokom_attention.log', 'w') as f:
+    with open('poly_bpe_vy.log', 'w') as f:
         f.write(str(pred_table))
 

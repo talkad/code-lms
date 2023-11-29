@@ -20,14 +20,13 @@ LEX_VOCAB=sum([len(v) for v in lexer.tokens.values()])
 logger.info(f'lex vocan amount is {LEX_VOCAB}')
 
 
-def calculate_metrics(logits, labels):
-    y = labels
-    logits = logits
+def calculate_metrics(logits, labels, mask):
+    y = labels[mask==1]
+    logits = logits[mask==1]
 
     ce = cross_entropy(logits, one_hot(y, num_classes=logits.shape[-1]).to(torch.float32), reduction='sum')
-    my_ce = cross_entropy(logits, one_hot(y, num_classes=logits.shape[-1]).to(torch.float32), reduction='mean')
 
-    return {'ce': ce, 'my_ce': my_ce}
+    return {'ce': ce}
 
 
 
@@ -73,7 +72,7 @@ def eval(args):
     progress_bar = tqdm(range(args.num_epochs * len(test_dataloader)))
 
     total_ce, total_tokens = 0.0, 0
-    my_ce, num_token = 0.0,  0
+    num_token = 0
     batches_to_print = 100
     
     for epoch in range(args.num_epochs):
@@ -85,22 +84,17 @@ def eval(args):
             outputs = model(input_ids=tensor_batch['input_ids'])
             logits = outputs.logits
 
-            metrics = calculate_metrics(logits, tensor_batch['labels'])
+            metrics = calculate_metrics(logits, tensor_batch['labels'], tensor_batch['mask'])
             
             total_tokens += sum([len(list(pygments.lex(code, lexer))) for code in batch['code']])
-            num_token += sum([len(tokenizer.tokenize(code)) for code in batch['code']]) 
+            # num_token += sum([len(tokenizer.tokenize(code)) for code in batch['code']]) 
 
-            # print(num_token)
-            my_ce += metrics['my_ce'].item()
             total_ce += metrics['ce'].item()
 
             if (batch_idx + 1) % batches_to_print == 0:
                 ce_tensor = torch.tensor(total_ce)
                 perplexity=torch.exp(ce_tensor/(total_tokens*LEX_VOCAB))
-
-                my_ce = torch.tensor(my_ce)
-                my_ppl = torch.exp(my_ce/num_token)
-                print(f'PPL = {perplexity} | {my_ppl}')
+                print(f'PPL = {perplexity} ')
                 
             progress_bar.update(1)
 

@@ -7,46 +7,59 @@ from transformers import get_cosine_with_hard_restarts_schedule_with_warmup, Tra
 from tqdm.auto import tqdm
 from torch.nn.functional import cross_entropy, one_hot
 from torch.utils.data import DataLoader
-from transformers import GPTNeoXForCausalLM
-
+from transformers import GPTNeoXForCausalLM, GPT2Tokenizer
+from transformers import get_linear_schedule_with_warmup
 
 
 logger = logging.getLogger()
 
 
-def calculate_metrics(logits, labels, mask):
-    y = labels[mask==1][1:]
-    logits = logits[mask==1][:-1]
+def calculate_metrics(logits, labels):
+    # import pdb; pdb.set_trace()
+    y = labels
+    logits = logits
 
     ce_loss = cross_entropy(logits, one_hot(y, num_classes=logits.shape[-1]).to(torch.float32), reduction='mean')
 
-    preds = torch.argmax(logits,dim=-1) 
-    accuracy = (preds==y).to(torch.float32).mean()
+    # preds = torch.argmax(logits,dim=-1) 
+    # accuracy = (preds==y).to(torch.float32).mean()
 
-    num_tokenized_tokens = len(y)
-    perplexity = torch.exp(ce_loss / num_tokenized_tokens)
+    # num_tokenized_tokens = len(y)
+    # perplexity = torch.exp(ce_loss / num_tokenized_tokens)
 
-    return {'loss': ce_loss, 'accuracy': accuracy, 'perplexity': perplexity}
-
+    return {'loss': ce_loss}  # , 'accuracy': accuracy, 'perplexity': perplexity}
 
 
 def finetune(args):
     logger.info(f'start finetune {args.model_name}')
 
-
     # get data
-    train, test = data_omp.build_omp_dataset(args)
-    train_dataloader = DataLoader(train, batch_size=args.batch_size, shuffle=True)
+    # tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
+    #                           truncation=True, model_input_names=['input_ids'])
+    # tokenizer.pad_token = tokenizer.eos_token
+
+    traind, testd= data_omp.build_omp_dataset(args)
+
+    # newd = []
+    # for i in range(len(datasets)):
+    #     d = datasets[i]
+    #     outd = d.map(lambda examples: tokenizer(examples['code'])) #, remove_columns=['source', 'code'])
+    #     newd.append(outd)
+    # traind, testd = newd
    
-    # get model
+
+    train_loader = DataLoader(dataset=traind, batch_size=args.batch_size)
+
+    # MODEL
     model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))        
     model.train()
 
     # freeze parameters model
-    freeze_layers = list(range(0, 6))
-    for name, param in model.named_parameters():
-        if any([f'layers.{layer}' in name for layer in freeze_layers]):      
-            param.requires_grad = False
+    if args.freeze:
+        freeze_layers = list(range(0, 5))
+        for name, param in model.named_parameters():
+            if any([f'layers.{layer}' in name for layer in freeze_layers]):      
+                param.requires_grad = False
 
     for name, param in model.named_parameters():
         logger.info(f'param: {name} grad is {param.requires_grad}')
@@ -63,45 +76,38 @@ def finetune(args):
 
     optimizer = AdamW(model.parameters(), lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), eps=args.adam_eps,
                       weight_decay=args.weight_decay)
-    scheduler = get_cosine_with_hard_restarts_schedule_with_warmup(optimizer, num_warmup_steps=args.warmup_steps,
-                                                                   num_training_steps=args.training_steps)
 
+    lr_scheduler = get_linear_schedule_with_warmup(optimizer=optimizer,
+                                                   num_warmup_steps=100,
+                                                   num_training_steps=(len(train_loader) * args.num_epochs),)
+    
     model.to(args.device)
-    model.train()
+    # import pdb ; pdb.set_trace()
 
     # TRAIN
-    progress_bar = tqdm(range(args.num_epochs * len(train_dataloader)))
-
-    running_loss, running_acc, running_ppl = 0.0, 0.0, 0.0
-    batches_to_print = 100
 
     for epoch in range(args.num_epochs):
-        for batch_idx, batch in enumerate(train_dataloader):
-            # import pdb; pdb.set_trace()
+        pbar = tqdm(train_loader, miniters=2, desc=f"Epoch {epoch}")
+        loss_total = 0.0 
+
+        for step, batch in enumerate(pbar):
             tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask']}
 
             outputs = model(input_ids=tensor_batch['input_ids'])
             logits = outputs.logits
 
-            metrics = calculate_metrics(logits, tensor_batch['labels'], tensor_batch['mask'])
+            metrics = calculate_metrics(logits, tensor_batch['input_ids'])
             loss = metrics['loss']
 
             loss.backward()
-
             optimizer.step()
-            scheduler.step()
+            lr_scheduler.step()
             optimizer.zero_grad()
 
-            running_loss += loss.item()
-            running_acc += metrics['accuracy'].item()
-            running_ppl += metrics['perplexity'].item()
+            loss_total += loss.detach().clone().item()
 
-            if (batch_idx + 1) % batches_to_print == 0:
-                mean_loss = running_loss / batches_to_print
-                print(f'Epoch {epoch + 1}, Batch {batch_idx + 1}/{len(train_dataloader)}, Mean Loss: {mean_loss:.4f}, mean acc {running_acc/batches_to_print:.4f}, mean PPL {running_ppl/batches_to_print:.4f}')
-                running_loss, running_acc, running_ppl = 0.0, 0.0, 0.0
+            if (step > 0) and (step % 10 == 0):
+                pbar.set_postfix({"avg_train_loss": loss_total / step})
 
-            progress_bar.update(1)
-
-    model.save_pretrained(os.path.join(args.save_dir, 'poly_bpe_freeze-0-5'), from_pt=True) 
+    model.save_pretrained(os.path.join(args.save_dir, 'poly_bpe_vy'), from_pt=True) 
 

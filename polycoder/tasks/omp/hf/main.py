@@ -58,6 +58,7 @@ if __name__=='__main__':
     parser.add_argument('--adam_beta1', type=float, default=0.9, help="Beta1 for the Adam optimizer")
     parser.add_argument('--adam_beta2', type=float, default=0.999, help="Beta2 for the Adam optimizer")
     parser.add_argument('--adam_eps', type=float, default=1e-8, help="Epsilon for the Adam optimizer")
+    parser.add_argument('--freeze', action='store_true',  help="freeze the first layers of the model")
 
     main_args = parser.parse_args()
 

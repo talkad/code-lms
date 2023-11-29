@@ -90,8 +90,12 @@ def build_omp_dataset(args, rebuild=False):
 
         def tokenize_and_parse(example, eos_token=eos_token):
             # import pdb; pdb.set_trace()
-            code = lexicalize(example["code"], replaced=args.is_replaced)
+
+            code = example["code"]
             pragma = example["pragma"]
+
+            if args.is_replaced:
+                code = lexicalize(code, replaced=args.is_replaced)
 
             # ### Simplified pragma ###
             # pragma_dict = pragma2dict(pragma)
@@ -101,10 +105,10 @@ def build_omp_dataset(args, rebuild=False):
             ### Data Preproccess ###
             pragma = pragma[pragma.find('for'):]
             pragma = pragma.replace('parallel', '')
-            pragma = pragma.replace('(', ' ( ').replace(')', ' ) ').replace(':', ' : ').replace(',', ' , ')
 
             if args.is_replaced:
                 pragma = pragma.replace('_', ' ')
+                pragma = pragma.replace('(', ' ( ').replace(')', ' ) ').replace(':', ' : ').replace(',', ' , ')
             #########################
 
             if args.is_replaced:
@@ -119,28 +123,37 @@ def build_omp_dataset(args, rebuild=False):
                 eos_id = tokenizer.eod_id
 
                 code = tokenizer.tokenize(code)
-                pragma = tokenizer.tokenize(f'{pragma}')
+                pragma = tokenizer.tokenize(pragma)
 
             if args.do_eval: # for PPL evaluation only the code is used without the pragma
                 full = code + [eos_id]
+            elif args.do_test:
+                full = code + [sep_id]
             else:
                 full =  code + [sep_id] + pragma + [eos_id]  
 
             example["input_ids"] = full
 
+            ## PADDING and MASKING ##
             max_length = 512
             example["input_ids"] = example["input_ids"][:max_length]
             example["input_ids"] += (max_length - len(example["input_ids"])) * [tokenizer.pad_id]
 
             labels = example["input_ids"].copy()
             example["labels"] = labels
+            
+            if args.do_eval or args.do_test:
+                example["mask"] = [1] * len(code) + [1]  + [0] * (max_length - len(code) -1)
+                example["mask"] = example["mask"][:max_length]
+            else:
+                example["mask"] = [0] * len(code) + [1] * (len(pragma)+2) + [0] * (max_length - len(code) - len(pragma)-2)
+                example["mask"] = example["mask"][:max_length]
+            ##########################
 
-            example["mask"] = [0] * len(code) + [1] * (len(pragma)+2) + [0] * (max_length - len(code) - len(pragma)-2)
-            example["mask"] = example["mask"][:max_length]
+            labels = example["input_ids"].copy()
+            example["labels"] = labels
 
             example["length"] = len(example["input_ids"])
-
-            assert len(example["input_ids"]) == max_length and len(example["mask"]) == max_length
 
             return example
 
