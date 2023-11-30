@@ -106,54 +106,63 @@ def build_omp_dataset(args, rebuild=False):
             pragma = pragma[pragma.find('for'):]
             pragma = pragma.replace('parallel', '')
 
+            pragma = pragma.replace('(', ' ( ').replace(')', ' ) ').replace(':', ' : ').replace(',', ' , ')
             if args.is_replaced:
                 pragma = pragma.replace('_', ' ')
-                pragma = pragma.replace('(', ' ( ').replace(')', ' ) ').replace(':', ' : ').replace(',', ' , ')
             #########################
 
-            if args.is_replaced:
-                sep_id, _ = tokenizer.tokenize('[SEP]')
-                sep_id = sep_id[0]
-                eos_id = tokenizer.eod
+            example['code'] = f'{code}\n#pragma omp {pragma}'
 
-                code, _ = tokenizer.tokenize(code)
-                pragma, _ = tokenizer.tokenize(pragma)
-            else:
-                sep_id = tokenizer.tokenize('\n')[0]
-                eos_id = tokenizer.eod_id
+            # ###### Vy TODO: check  ######
+            # code = f"{code}\n{pragma}"
+            # example['code'] = re.sub(r'\s+', ' ', code)
+            # #############################
 
-                code = tokenizer.tokenize(code)
-                pragma = tokenizer.tokenize(pragma)
+            # if args.is_replaced:
+            #     sep_id, _ = tokenizer.tokenize('[SEP]')
+            #     sep_id = sep_id[0]
+            #     eos_id = tokenizer.eod
 
-            if args.do_eval: # for PPL evaluation only the code is used without the pragma
-                full = code + [eos_id]
-            elif args.do_test:
-                full = code + [sep_id]
-            else:
-                full =  code + [sep_id] + pragma + [eos_id]  
+            #     code, _ = tokenizer.tokenize(code)
+            #     pragma, _ = tokenizer.tokenize(pragma)
+            # else:
+            #     sep_id = tokenizer.tokenize('\n')[0]
+            #     eos_id = tokenizer.eod_id
 
-            example["input_ids"] = full
+            #     code = tokenizer.tokenize(code)
+            #     pragma = tokenizer.tokenize(pragma)
+
+            # if args.do_eval: # for PPL evaluation only the code is used without the pragma
+            #     full = code + [eos_id]
+            # elif args.do_test:
+            #     full = code + [sep_id]
+            # else:
+            #     full =  code + [sep_id] + pragma + [eos_id]  
+
+            # example["input_ids"] = full
+
+
 
             ## PADDING and MASKING ##
-            max_length = 512
-            example["input_ids"] = example["input_ids"][:max_length]
-            example["input_ids"] += (max_length - len(example["input_ids"])) * [tokenizer.pad_id]
+            # max_length = 512
+            # example["input_ids"] = example["input_ids"][:max_length]
+            # example["input_ids"] += (max_length - len(example["input_ids"])) * [tokenizer.pad_id]
 
-            labels = example["input_ids"].copy()
-            example["labels"] = labels
+            # labels = example["input_ids"].copy()
+            # example["labels"] = labels
             
-            if args.do_eval or args.do_test:
-                example["mask"] = [1] * len(code) + [1]  + [0] * (max_length - len(code) -1)
-                example["mask"] = example["mask"][:max_length]
-            else:
-                example["mask"] = [0] * len(code) + [1] * (len(pragma)+2) + [0] * (max_length - len(code) - len(pragma)-2)
-                example["mask"] = example["mask"][:max_length]
+            # if args.do_eval or args.do_test:
+            #     example["mask"] = [1] * len(code) + [1]  + [0] * (max_length - len(code) -1)
+            #     example["mask"] = example["mask"][:max_length]
+            # else:
+            #     example["mask"] = [0] * len(code) + [1] * (len(pragma)+2) + [0] * (max_length - len(code) - len(pragma)-2)
+            #     example["mask"] = example["mask"][:max_length]
             ##########################
 
-            labels = example["input_ids"].copy()
-            example["labels"] = labels
+            # labels = example["input_ids"].copy()
+            # example["labels"] = labels
 
-            example["length"] = len(example["input_ids"])
+            # example["length"] = len(example["input_ids"])
 
             return example
 
@@ -164,9 +173,12 @@ def build_omp_dataset(args, rebuild=False):
 
         tokenized_dataset = d.map(tokenize_and_parse, batched=False)
 
-        tokenized_dataset.set_format(type="torch",
-                                     columns=['input_ids', 'labels', 'mask'],
-                                     output_all_columns=True)
+        # tokenized_dataset.set_format(type="torch",
+        #                              columns=['input_ids', 'labels', 'mask'],
+        #                              output_all_columns=True)
+
+        tokenized_dataset.set_format(output_all_columns=True)
+
         if args.save:
             tokenized_dataset.save_to_disk(args.data_path)
 

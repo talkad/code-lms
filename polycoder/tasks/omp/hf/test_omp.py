@@ -10,7 +10,8 @@ from torch.utils.data import DataLoader
 from transformers import GPTNeoXForCausalLM
 from prettytable import PrettyTable
 from tokenizer import TokompilerTokenizer, _GPT2BPETokenizer
-
+from transformers import GPTNeoXForCausalLM, GPT2Tokenizer
+from transformers import DataCollatorForLanguageModeling, get_linear_schedule_with_warmup
 
 
 logger = logging.getLogger()
@@ -37,11 +38,29 @@ def concat_vars(pragma):
 def test(args):
     logger.info('start test')
 
-    train, test = data_omp.build_omp_dataset(args)
-    test_dataloader = DataLoader(test, batch_size=1)
+    # train, test = data_omp.build_omp_dataset(args)
+    # test_dataloader = DataLoader(test, batch_size=1)
+
+    tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, model_input_names=['input_ids'])
+    tokenizer.pad_token = tokenizer.eos_token
+
+    datasets = data_omp.build_omp_dataset(args)
+    pragmas = [sample['pragma'] for sample in datasets[1]]
+
+    newd = []
+    for i in range(len(datasets)):
+        d = datasets[i]
+        outd = d.map(lambda examples: tokenizer(examples['code'], max_length=512, truncation=True, padding=True), remove_columns=['pragma', 'code', 'hash'])
+        newd.append(outd)
+    traind, testd = newd
+   
+    collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)
+    test_dataloader = DataLoader(dataset=testd, batch_size=1, collate_fn=collator)
+    # import pdb; pdb.set_trace()
+    assert len(pragmas) == len(test_dataloader)
 
     # get model
-    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, 'poly_bpe_vy'))
+    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, 'poly_bpe_v2'))
 
     model.to(args.device)
     model.eval()
@@ -57,7 +76,8 @@ def test(args):
 
         if args.vocab_file is None:
             lgger.info("WARNING: No vocab file found, loading Huggingface's pretrained GPT2Tokenizer")
-        tokenizer = _GPT2BPETokenizer(args.vocab_file, args.merge_file)
+        # tokenizer = _GPT2BPETokenizer(args.vocab_file, args.merge_file)
+        tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file)
 
 
 
@@ -74,7 +94,8 @@ def test(args):
         tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask']}
         # mask = tensor_batch['mask']
         # labels = tensor_batch['labels']
-        outputs = model(input_ids=tensor_batch['input_ids'])
+        # outputs = model(input_ids=tensor_batch['input_ids'])
+        outputs = model(**tensor_batch)
         logits = outputs.logits
 
         # logits = logits[mask==1][:-2]
@@ -86,12 +107,12 @@ def test(args):
         except:
             pred = ''
 
-        pred_table.add_row([batch['pragma'][0], 
+        pred_table.add_row([pragmas[i-1], 
                             pred[pred.rfind('\n')+1:]])
 
        
         progress_bar.update(1)
 
-    with open('poly_bpe_vy.log', 'w') as f:
+    with open('reslts/poly_bpe_v2.log', 'w') as f:
         f.write(str(pred_table))
 

@@ -8,8 +8,9 @@ from tqdm.auto import tqdm
 from torch.nn.functional import cross_entropy, one_hot
 from torch.utils.data import DataLoader
 from transformers import GPTNeoXForCausalLM, GPT2Tokenizer
-from transformers import get_linear_schedule_with_warmup
+from transformers import DataCollatorForLanguageModeling, get_linear_schedule_with_warmup
 
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 logger = logging.getLogger()
 
@@ -34,24 +35,30 @@ def finetune(args):
     logger.info(f'start finetune {args.model_name}')
 
     # get data
+
+    tokenizer = AutoTokenizer.from_pretrained("NinedayWang/PolyCoder-2.7B")
+    tokenizer.pad_token = tokenizer.eos_token
+    model = AutoModelForCausalLM.from_pretrained("NinedayWang/PolyCoder-2.7B", torch_dtype=torch.float16,)
+
     # tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
     #                           truncation=True, model_input_names=['input_ids'])
     # tokenizer.pad_token = tokenizer.eos_token
 
-    traind, testd= data_omp.build_omp_dataset(args)
 
-    # newd = []
-    # for i in range(len(datasets)):
-    #     d = datasets[i]
-    #     outd = d.map(lambda examples: tokenizer(examples['code'])) #, remove_columns=['source', 'code'])
-    #     newd.append(outd)
-    # traind, testd = newd
+    datasets = data_omp.build_omp_dataset(args)
+
+    newd = []
+    for i in range(len(datasets)):
+        d = datasets[i]
+        outd = d.map(lambda examples: tokenizer(examples['code'], max_length=1024, truncation=True, padding=True), remove_columns=['pragma', 'code', 'hash'])
+        newd.append(outd)
+    traind, testd = newd
    
-
-    train_loader = DataLoader(dataset=traind, batch_size=args.batch_size)
+    collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)
+    train_loader = DataLoader(dataset=traind, batch_size=args.batch_size, collate_fn=collator)
 
     # MODEL
-    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))        
+    # model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))        
     model.train()
 
     # freeze parameters model
@@ -85,19 +92,18 @@ def finetune(args):
     # import pdb ; pdb.set_trace()
 
     # TRAIN
-
     for epoch in range(args.num_epochs):
         pbar = tqdm(train_loader, miniters=2, desc=f"Epoch {epoch}")
         loss_total = 0.0 
 
         for step, batch in enumerate(pbar):
-            tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask']}
+            tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask', 'attention_mask']}
 
-            outputs = model(input_ids=tensor_batch['input_ids'])
-            logits = outputs.logits
+            outputs = model(**tensor_batch)
+            # logits = outputs.logits
 
-            metrics = calculate_metrics(logits, tensor_batch['input_ids'])
-            loss = metrics['loss']
+            # metrics = calculate_metrics(logits, tensor_batch['input_ids'])
+            loss = outputs.loss # metrics['loss']
 
             loss.backward()
             optimizer.step()
@@ -106,8 +112,13 @@ def finetune(args):
 
             loss_total += loss.detach().clone().item()
 
-            if (step > 0) and (step % 10 == 0):
+            if (step > 0) and (step % 100 == 0):
+                print(f'{loss_total} / {step}')
                 pbar.set_postfix({"avg_train_loss": loss_total / step})
 
-    model.save_pretrained(os.path.join(args.save_dir, 'poly_bpe_vy'), from_pt=True) 
+        print('save model')
+        model.save_pretrained(os.path.join(args.save_dir, 'poly_orig'), from_pt=True) 
+
+
+    model.save_pretrained(os.path.join(args.save_dir, 'poly_orig'), from_pt=True) 
 
