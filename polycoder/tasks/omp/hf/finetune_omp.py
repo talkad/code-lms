@@ -15,61 +15,34 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 logger = logging.getLogger()
 
 
-def calculate_metrics(logits, labels):
-    # import pdb; pdb.set_trace()
-    y = labels
-    logits = logits
-
-    ce_loss = cross_entropy(logits, one_hot(y, num_classes=logits.shape[-1]).to(torch.float32), reduction='mean')
-
-    # preds = torch.argmax(logits,dim=-1) 
-    # accuracy = (preds==y).to(torch.float32).mean()
-
-    # num_tokenized_tokens = len(y)
-    # perplexity = torch.exp(ce_loss / num_tokenized_tokens)
-
-    return {'loss': ce_loss}  # , 'accuracy': accuracy, 'perplexity': perplexity}
+tokenizer = GPT2Tokenizer(vocab_file='../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json', merges_file='../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt', padding=True,
+                              truncation=True, model_input_names=['input_ids'])
+tokenizer.pad_token = tokenizer.eos_token
 
 
 def finetune(args):
+    
     logger.info(f'start finetune {args.model_name}')
 
-    # get data
-
-    tokenizer = AutoTokenizer.from_pretrained("NinedayWang/PolyCoder-2.7B")
-    tokenizer.pad_token = tokenizer.eos_token
-    model = AutoModelForCausalLM.from_pretrained("NinedayWang/PolyCoder-2.7B", torch_dtype=torch.float16,)
-
-    # tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
-    #                           truncation=True, model_input_names=['input_ids'])
-    # tokenizer.pad_token = tokenizer.eos_token
-
-
+    # DATA
     datasets = data_omp.build_omp_dataset(args)
-
+    
     newd = []
     for i in range(len(datasets)):
         d = datasets[i]
-        outd = d.map(lambda examples: tokenizer(examples['code'], max_length=1024, truncation=True, padding=True), remove_columns=['pragma', 'code', 'hash'])
+        outd = d.map(lambda examples: tokenizer(examples['full'], max_length=2048, add_special_tokens=True, truncation=True, padding=True), remove_columns=['pragma', 'code', 'hash', 'full'])     
         newd.append(outd)
+
     traind, testd = newd
    
     collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)
     train_loader = DataLoader(dataset=traind, batch_size=args.batch_size, collate_fn=collator)
+    test_loader = DataLoader(dataset=testd, batch_size=args.batch_size, collate_fn=collator)
+
 
     # MODEL
-    # model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))        
+    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))        
     model.train()
-
-    # freeze parameters model
-    if args.freeze:
-        freeze_layers = list(range(0, 5))
-        for name, param in model.named_parameters():
-            if any([f'layers.{layer}' in name for layer in freeze_layers]):      
-                param.requires_grad = False
-
-    for name, param in model.named_parameters():
-        logger.info(f'param: {name} grad is {param.requires_grad}')
 
     # update model embeddings
     if args.is_replaced:
@@ -81,6 +54,7 @@ def finetune(args):
         model.resize_token_embeddings(new_num_embeddings)
         logger.info(f'Embedding layer has changed: {num_embeddings} -> {new_num_embeddings}')
 
+
     optimizer = AdamW(model.parameters(), lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), eps=args.adam_eps,
                       weight_decay=args.weight_decay)
 
@@ -89,7 +63,7 @@ def finetune(args):
                                                    num_training_steps=(len(train_loader) * args.num_epochs),)
     
     model.to(args.device)
-    # import pdb ; pdb.set_trace()
+    # import pdb; pdb.set_trace()
 
     # TRAIN
     for epoch in range(args.num_epochs):
@@ -100,10 +74,7 @@ def finetune(args):
             tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask', 'attention_mask']}
 
             outputs = model(**tensor_batch)
-            # logits = outputs.logits
-
-            # metrics = calculate_metrics(logits, tensor_batch['input_ids'])
-            loss = outputs.loss # metrics['loss']
+            loss = outputs.loss 
 
             loss.backward()
             optimizer.step()
@@ -112,13 +83,23 @@ def finetune(args):
 
             loss_total += loss.detach().clone().item()
 
-            if (step > 0) and (step % 100 == 0):
-                print(f'{loss_total} / {step}')
+            if (step > 0) and (step % 10 == 0):
+                logger.info(f'loss: {loss_total / (step+1)}')
                 pbar.set_postfix({"avg_train_loss": loss_total / step})
 
+        # VALIDATION       
+        # val_loss = 0.0
+        # for step_val, batch_val in enumerate(test_loader):
+        #     tensor_batch = {k: v.to(args.device) for k, v in batch_val.items() if k in ['input_ids', 'labels', 'mask', 'attention_mask']}
+
+        #     outputs = model(**tensor_batch)
+        #     loss = outputs.loss 
+        #     val_loss += loss.detach().clone().item()
+        # logger.info(f'val loss:  {val_loss / (step_val+1)}')
+                
+
         print('save model')
-        model.save_pretrained(os.path.join(args.save_dir, 'poly_orig'), from_pt=True) 
+        model.save_pretrained(os.path.join(args.save_dir, 'poly_bpe'), from_pt=True) 
 
-
-    model.save_pretrained(os.path.join(args.save_dir, 'poly_orig'), from_pt=True) 
+    model.save_pretrained(os.path.join(args.save_dir, 'poly_bpe'), from_pt=True) 
 

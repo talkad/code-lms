@@ -46,7 +46,7 @@ def pragma2dict(pragma):
 def read_jsonl(file_path):
     with open(file_path, 'r') as f:
         lines = f.readlines()
-    return [json.loads(line.strip()) for line in lines]
+    return [json.loads(line.strip()) for line in lines if 'for' in line]
 
 
 def build_omp_dataset(args, rebuild=False):
@@ -79,7 +79,7 @@ def build_omp_dataset(args, rebuild=False):
         test_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'test.jsonl')
 
         train_dataset = read_jsonl(train_data_path)
-        test_dataset = read_jsonl(test_data_path)
+        test_dataset = read_jsonl(test_data_path)[:100]
 
         columns = train_dataset[0].keys()
         train_dataset = trd.Dataset.from_dict({col: [item[col] for item in train_dataset] for col in columns})
@@ -89,34 +89,31 @@ def build_omp_dataset(args, rebuild=False):
         
 
         def tokenize_and_parse(example, eos_token=eos_token):
-            # import pdb; pdb.set_trace()
 
             code = example["code"]
-            pragma = example["pragma"]
-
             if args.is_replaced:
                 code = lexicalize(code, replaced=args.is_replaced)
 
-            # ### Simplified pragma ###
-            # pragma_dict = pragma2dict(pragma)
-            # pragma = f"for {'|| private' if 'private' in pragma_dict else ''} {' '.join(pragma_dict['private']['vars']) if 'private' in pragma_dict else ''} {'|| reduction' if 'reduction' in pragma_dict else ''} {pragma_dict['reduction']['operator'] + ' : ' + ' '.join(pragma_dict['reduction']['vars']) if 'reduction' in pragma_dict else ''} "
-            # #########################
-
-            ### Data Preproccess ###
-            pragma = pragma[pragma.find('for'):]
+            pragma = example["pragma"]
             pragma = pragma.replace('parallel', '')
-
             pragma = pragma.replace('(', ' ( ').replace(')', ' ) ').replace(':', ' : ').replace(',', ' , ')
             if args.is_replaced:
                 pragma = pragma.replace('_', ' ')
-            #########################
 
-            example['code'] = f'{code}\n#pragma omp {pragma}'
+            example["full"] = f'{code}\n#pragma omp {pragma}'
 
-            # ###### Vy TODO: check  ######
-            # code = f"{code}\n{pragma}"
-            # example['code'] = re.sub(r'\s+', ' ', code)
-            # #############################
+            return example
+
+            # ### Data Preproccess ###
+            # pragma = pragma[pragma.find('for'):]
+            # pragma = pragma.replace('parallel', '')
+
+            # pragma = pragma.replace('(', ' ( ').replace(')', ' ) ').replace(':', ' : ').replace(',', ' , ')
+            # 
+            # #########################
+
+            # example['code'] = code
+            # example['pragma'] = f'#pragma omp {pragma}'
 
             # if args.is_replaced:
             #     sep_id, _ = tokenizer.tokenize('[SEP]')
@@ -164,7 +161,7 @@ def build_omp_dataset(args, rebuild=False):
 
             # example["length"] = len(example["input_ids"])
 
-            return example
+            # return example
 
         # JSON fields are:
         #   hash: an alphanumeric identifier
@@ -172,10 +169,6 @@ def build_omp_dataset(args, rebuild=False):
         #   pragma: the pragma to predict given the input code
 
         tokenized_dataset = d.map(tokenize_and_parse, batched=False)
-
-        # tokenized_dataset.set_format(type="torch",
-        #                              columns=['input_ids', 'labels', 'mask'],
-        #                              output_all_columns=True)
 
         tokenized_dataset.set_format(output_all_columns=True)
 

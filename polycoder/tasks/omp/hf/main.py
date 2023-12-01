@@ -13,6 +13,7 @@ def main(args):
         finetune(args)
 
     if args.do_eval:
+        #TODO: loss and perplexity of BPE of test HPCorpus
         eval(args)
     
     if args.do_test:
@@ -50,7 +51,7 @@ if __name__=='__main__':
     # Training args
     parser.add_argument('--save_dir', type=str, default='outputs', help="Directory to save model checkpoints")
     parser.add_argument('--batch_size', type=int, default=16, help="Big batch sizes are allowed (total #tokens per batch 262144)")
-    parser.add_argument('--lr', type=float, default=0.0001, help="Learning rate for the optimizer")
+    parser.add_argument('--lr', type=float, default=16e-5, help="Learning rate for the optimizer")
     parser.add_argument('--warmup_steps', type=int, default=400, help="Number of warmup steps")
     parser.add_argument('--weight_decay', type=float, default=0, help="Weight decay for the optimizer")
     parser.add_argument('--training_steps', type=int, default=100, help="Total number of training steps")
