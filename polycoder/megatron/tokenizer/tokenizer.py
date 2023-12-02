@@ -307,6 +307,16 @@ class TokompilerTokenizer(AbstractTokenizer):
 
         self.pad_id = self.tokenizer.token_to_id('[PAD]')
 
+    def __call__(self, text, max_length=2048, truncation=True, padding=True, **kwargs):
+        if padding:
+            self.tokenizer.enable_padding(max_length)
+
+        if truncation:
+            self.tokenizer.enable_truncation(max_length)
+
+        return self.tokenizer.encode(text)[0]
+
+
     @property
     def vocab_size(self):
         return len(self.tokenizer.encoder)
@@ -325,6 +335,9 @@ class TokompilerTokenizer(AbstractTokenizer):
         return self.tokenizer.encode(text)
 
     def detokenize(self, token_ids):
+        return self.tokenizer.decode(token_ids)
+
+    def decode(self, token_ids):
         return self.tokenizer.decode(token_ids)
 
     def add_tokens(self, new_tokens):

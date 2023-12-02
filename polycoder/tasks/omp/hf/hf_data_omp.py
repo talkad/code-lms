@@ -74,12 +74,16 @@ def build_omp_dataset(args, rebuild=False):
             "pragma": Value("string"),
             "hash": Value("string"),
         })
+        # TODO: remove this comments
+        # train_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'train.jsonl')
+        # test_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'test.jsonl')
 
-        train_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'train.jsonl')
-        test_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'test.jsonl')
+        train_data_path = os.path.join(args.data_path, args.data_device, 'replaced', 'train.jsonl')
+        test_data_path = os.path.join(args.data_path, args.data_device, 'replaced', 'test.jsonl')
+
 
         train_dataset = read_jsonl(train_data_path)
-        test_dataset = read_jsonl(test_data_path)[:100]
+        test_dataset = read_jsonl(test_data_path)
 
         columns = train_dataset[0].keys()
         train_dataset = trd.Dataset.from_dict({col: [item[col] for item in train_dataset] for col in columns})
@@ -92,76 +96,25 @@ def build_omp_dataset(args, rebuild=False):
 
             code = example["code"]
             if args.is_replaced:
-                code = lexicalize(code, replaced=args.is_replaced)
+                code = lexicalize(code, replaced=True)
 
             pragma = example["pragma"]
             pragma = pragma.replace('parallel', '')
+            pragma = pragma.replace('omp', '')
             pragma = pragma.replace('(', ' ( ').replace(')', ' ) ').replace(':', ' : ').replace(',', ' , ')
             if args.is_replaced:
                 pragma = pragma.replace('_', ' ')
 
-            example["full"] = f'{code}\n#pragma omp {pragma}'
+            if args.is_replaced:
+                sep_token = '[SEP]'
+                eos_token = '[EOS]'
+            else:
+                sep_token = '\n'
+                eos_token = '' # eos equals to padding
+
+            example["full"] = f'{code} {sep_token} parallel {pragma} {eos_token}'
 
             return example
-
-            # ### Data Preproccess ###
-            # pragma = pragma[pragma.find('for'):]
-            # pragma = pragma.replace('parallel', '')
-
-            # pragma = pragma.replace('(', ' ( ').replace(')', ' ) ').replace(':', ' : ').replace(',', ' , ')
-            # 
-            # #########################
-
-            # example['code'] = code
-            # example['pragma'] = f'#pragma omp {pragma}'
-
-            # if args.is_replaced:
-            #     sep_id, _ = tokenizer.tokenize('[SEP]')
-            #     sep_id = sep_id[0]
-            #     eos_id = tokenizer.eod
-
-            #     code, _ = tokenizer.tokenize(code)
-            #     pragma, _ = tokenizer.tokenize(pragma)
-            # else:
-            #     sep_id = tokenizer.tokenize('\n')[0]
-            #     eos_id = tokenizer.eod_id
-
-            #     code = tokenizer.tokenize(code)
-            #     pragma = tokenizer.tokenize(pragma)
-
-            # if args.do_eval: # for PPL evaluation only the code is used without the pragma
-            #     full = code + [eos_id]
-            # elif args.do_test:
-            #     full = code + [sep_id]
-            # else:
-            #     full =  code + [sep_id] + pragma + [eos_id]  
-
-            # example["input_ids"] = full
-
-
-
-            ## PADDING and MASKING ##
-            # max_length = 512
-            # example["input_ids"] = example["input_ids"][:max_length]
-            # example["input_ids"] += (max_length - len(example["input_ids"])) * [tokenizer.pad_id]
-
-            # labels = example["input_ids"].copy()
-            # example["labels"] = labels
-            
-            # if args.do_eval or args.do_test:
-            #     example["mask"] = [1] * len(code) + [1]  + [0] * (max_length - len(code) -1)
-            #     example["mask"] = example["mask"][:max_length]
-            # else:
-            #     example["mask"] = [0] * len(code) + [1] * (len(pragma)+2) + [0] * (max_length - len(code) - len(pragma)-2)
-            #     example["mask"] = example["mask"][:max_length]
-            ##########################
-
-            # labels = example["input_ids"].copy()
-            # example["labels"] = labels
-
-            # example["length"] = len(example["input_ids"])
-
-            # return example
 
         # JSON fields are:
         #   hash: an alphanumeric identifier
