@@ -12,6 +12,8 @@ from transformers import DataCollatorForLanguageModeling, get_linear_schedule_wi
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from tokenizer import TokompilerTokenizer
 
+from torch.cuda.amp import autocast
+
 logger = logging.getLogger()
 
 
@@ -57,8 +59,11 @@ def finetune(args):
         tokenizer.add_tokens(tokom_extended_tokens)
         tokenizer.enable_padding(length=2048)
     else:
-        tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
-                                truncation=True, model_input_names=['input_ids'])
+        tokenizer = AutoTokenizer.from_pretrained("NinedayWang/PolyCoder-2.7B", 
+                                  truncation=True, model_input_names=['input_ids'])
+
+        # tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
+        #                         truncation=True, model_input_names=['input_ids'])
         tokenizer.pad_token = tokenizer.eos_token
 
 
@@ -92,8 +97,16 @@ def finetune(args):
 
 
     # MODEL
-    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))        
+    model = AutoModelForCausalLM.from_pretrained("NinedayWang/PolyCoder-2.7B") #, torch_dtype=torch.float16)
+    model.half()
+    # model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))        
     model.train()
+
+    if args.freeze:
+        freeze_layers = list(range(0, 26))
+        for name, param in model.named_parameters():
+            if any([f'layers.{layer}' in name for layer in freeze_layers]):      
+                param.requires_grad = False
 
     # update model embeddings
     if args.is_replaced:
@@ -112,9 +125,10 @@ def finetune(args):
                                                    num_training_steps=(len(train_loader) * args.num_epochs),)
     
     model.to(args.device)
-    # import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
 
-
+    for name, param in model.named_parameters():
+        print(f"Parameter: {name}, Type: {param.dtype}")
     # TRAIN
     for epoch in range(args.num_epochs):
         pbar = tqdm(train_loader, miniters=2, desc=f"Epoch {epoch}")
@@ -122,9 +136,10 @@ def finetune(args):
 
         for step, batch in enumerate(train_loader):
             tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask', 'attention_mask']}
-
-            outputs = model(**tensor_batch)
-            loss = outputs.loss 
+            
+            with autocast():
+                outputs = model(**tensor_batch)
+                loss = outputs.loss 
 
             loss.backward()
             optimizer.step()
@@ -149,7 +164,7 @@ def finetune(args):
                 
 
         print('save model')
-        model.save_pretrained(os.path.join(args.save_dir, 'poly_parallel_replaced_bpe'), from_pt=True) 
+        model.save_pretrained(os.path.join(args.save_dir, 'poly_original_parallel_bpe'), from_pt=True) 
 
-    model.save_pretrained(os.path.join(args.save_dir, 'poly_parallel_replaced_bpe'), from_pt=True) 
+    model.save_pretrained(os.path.join(args.save_dir, 'poly_original_parallel_bpe'), from_pt=True) 
 

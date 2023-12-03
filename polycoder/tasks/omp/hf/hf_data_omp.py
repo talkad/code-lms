@@ -74,12 +74,13 @@ def build_omp_dataset(args, rebuild=False):
             "pragma": Value("string"),
             "hash": Value("string"),
         })
-        # TODO: remove this comments
-        # train_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'train.jsonl')
-        # test_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'test.jsonl')
+        
+        train_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'train.jsonl')
+        test_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'test.jsonl')
 
-        train_data_path = os.path.join(args.data_path, args.data_device, 'replaced', 'train.jsonl')
-        test_data_path = os.path.join(args.data_path, args.data_device, 'replaced', 'test.jsonl')
+        # TODO: remove this comments
+        # train_data_path = os.path.join(args.data_path, args.data_device, 'replaced', 'train.jsonl')
+        # test_data_path = os.path.join(args.data_path, args.data_device, 'replaced', 'test.jsonl')
 
 
         train_dataset = read_jsonl(train_data_path)

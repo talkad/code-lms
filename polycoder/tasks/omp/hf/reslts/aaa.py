@@ -25,10 +25,10 @@ pred_table.align["Label"] = "l"
 pred_table.align["Pred"] = "l"
 
 
-with open('final_poly_parallel_bpe_results.log', 'r') as f, open('final_poly_parallel_bpe_results_clean.log', 'w') as out:
+with open('poly_parallel_bpe_results.log', 'r') as f, open('final_poly_parallel_replaced_bpe_results_clean.log', 'w') as out:
     lines = f.readlines()[3:-1]
-    for line in lines:
-        
+    for idx, line in enumerate(lines):
+        # print(idx, line)
         splitted_line = line.split('|')
         label, pred = splitted_line[1], splitted_line[2]
         pred_table.add_row([label, f"parallel for {find_clause(pred, 'private')} {find_clause(pred, 'reduction')}"])
