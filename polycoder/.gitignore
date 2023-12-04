@@ -155,3 +155,7 @@ logs/
 tensorboard/
 src/
 **/outputs
+
+
+!**/final_results
+**/results/*.log

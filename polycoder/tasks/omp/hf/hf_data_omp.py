@@ -78,11 +78,6 @@ def build_omp_dataset(args, rebuild=False):
         train_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'train.jsonl')
         test_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'test.jsonl')
 
-        # TODO: remove this comments
-        # train_data_path = os.path.join(args.data_path, args.data_device, 'replaced', 'train.jsonl')
-        # test_data_path = os.path.join(args.data_path, args.data_device, 'replaced', 'test.jsonl')
-
-
         train_dataset = read_jsonl(train_data_path)
         test_dataset = read_jsonl(test_data_path)
 
@@ -111,7 +106,7 @@ def build_omp_dataset(args, rebuild=False):
                 eos_token = '[EOS]'
             else:
                 sep_token = '\n'
-                eos_token = '' # eos equals to padding
+                eos_token = '' # eos equals to padding - appended it at tokenization
 
             example["full"] = f'{code} {sep_token} parallel {pragma} {eos_token}'
 

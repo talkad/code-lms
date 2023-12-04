@@ -97,16 +97,9 @@ def finetune(args):
 
 
     # MODEL
-    model = AutoModelForCausalLM.from_pretrained("NinedayWang/PolyCoder-2.7B") #, torch_dtype=torch.float16)
-    model.half()
+    model = AutoModelForCausalLM.from_pretrained("NinedayWang/PolyCoder-2.7B")
     # model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))        
     model.train()
-
-    if args.freeze:
-        freeze_layers = list(range(0, 26))
-        for name, param in model.named_parameters():
-            if any([f'layers.{layer}' in name for layer in freeze_layers]):      
-                param.requires_grad = False
 
     # update model embeddings
     if args.is_replaced:
@@ -125,10 +118,8 @@ def finetune(args):
                                                    num_training_steps=(len(train_loader) * args.num_epochs),)
     
     model.to(args.device)
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
 
-    for name, param in model.named_parameters():
-        print(f"Parameter: {name}, Type: {param.dtype}")
     # TRAIN
     for epoch in range(args.num_epochs):
         pbar = tqdm(train_loader, miniters=2, desc=f"Epoch {epoch}")
@@ -164,7 +155,7 @@ def finetune(args):
                 
 
         print('save model')
-        model.save_pretrained(os.path.join(args.save_dir, 'poly_original_parallel_bpe'), from_pt=True) 
+        model.save_pretrained(os.path.join(args.save_dir, 'original_poly_bpe'), from_pt=True) 
 
-    model.save_pretrained(os.path.join(args.save_dir, 'poly_original_parallel_bpe'), from_pt=True) 
+    model.save_pretrained(os.path.join(args.save_dir, 'original_poly_bpe'), from_pt=True) 
 

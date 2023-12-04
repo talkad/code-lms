@@ -145,6 +145,6 @@ def test(args):
 
         progress_bar.update(1)
 
-    with open('reslts/poly_parallel_bpe_results.log', 'w') as f:
+    with open('results/poly_parallel_bpe_results.log', 'w') as f:
         f.write(str(pred_table))
 
