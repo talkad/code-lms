@@ -16,28 +16,6 @@ with open(r'/home/nadavsc/LIGHTBITS/mpiricalplus/source/dataset/mpi.code-snippet
 extended_tokens = [prefix.lower() for prefix in file.keys()]
 
 
-def max_length_dataset_filter(args, max_length=512):
-    tokenizer = build_tokenizer(args)
-    tokenizer.tokenizer.add_tokens(extended_tokens)
-    if args.tokenizer_type.lower() == 'GPT2BPETokenizer'.lower():
-        eos_token = tokenizer.eod_id
-    elif args.tokenizer_type.lower() == 'Tokompiler'.lower():
-        eos_token = tokenizer.eod
-
-    dataset_dir = args.data_path
-    dpath = f'{dataset_dir}/mccplus_target_replaced_dataset.jsonl'
-    with open(dpath, 'r') as db:
-        with open(os.path.join(dataset_dir, f'mccplus_target_replaced_dataset_{max_length}.jsonl'), 'w') as target_db:
-            for program in db:
-                json_obj = json.loads(program)
-                code = tokenizer.tokenize(json_obj['code'])[0]
-                mpi_label = tokenizer.tokenize(json_obj["mpi_labels"])[0]
-
-                full = code + [2] + mpi_label + [eos_token]
-                if len(full) <= 512:
-                    target_db.write(program)
-
-
 def build_mpi_dataset(args, rebuild=False):
     if (not rebuild) and os.path.exists(os.path.join(args.data_path, "dataset_dict.json")):
         print('Loading dataset')
