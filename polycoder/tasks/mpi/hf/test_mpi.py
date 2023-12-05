@@ -1,7 +1,9 @@
 import os
+import pdb
+import json
 import torch
 import logging
-import hf_data_omp as data_omp
+import hf_data_mpi as data_mpi
 from torch.optim import AdamW
 from transformers import get_cosine_with_hard_restarts_schedule_with_warmup
 from tqdm.auto import tqdm
@@ -12,7 +14,6 @@ from prettytable import PrettyTable
 from tokenizer.tokenizer import TokompilerTokenizer, _GPT2BPETokenizer
 from transformers import GPTNeoXForCausalLM, GPT2Tokenizer
 from transformers import DataCollatorForLanguageModeling, get_linear_schedule_with_warmup
-
 
 logger = logging.getLogger()
 
@@ -31,39 +32,27 @@ class CustomDataset(Dataset):
 
 def tokenize(args, tokenizer, sample):
     if not args.is_replaced:
-        encodings = tokenizer(sample['full'], max_length=args.max_length, add_special_tokens=True, truncation=True, padding=True)
+        encodings = tokenizer(sample['full'], max_length=args.max_length, add_special_tokens=True, truncation=True,
+                              padding=True)
 
         if len(encodings['input_ids']) < args.max_length:
             encodings['input_ids'].append(tokenizer.eos_token_id)
     else:
         encodings = {}
-        encodings['input_ids'] = tokenizer(sample['full'], max_length=args.max_length, add_special_tokens=True, truncation=True, padding=True)
+        encodings['input_ids'] = tokenizer(sample['full'], max_length=args.max_length, add_special_tokens=True,
+                                           truncation=True, padding=True)
         encodings['labels'] = encodings['input_ids'][:]
 
     return encodings
-
-
-def concat_vars(pragma):
-    unified_vars = []
-    tokens = pragma.split()
-
-    for idx, token in enumerate(tokens):
-        if token.isnumeric():
-            continue
-
-        if token in ['var', 'arr', 'struct', 'arg'] and idx < len(tokens) - 1 and tokens[idx + 1].isnumeric():
-            unified_vars.append(f'{token}_{tokens[idx + 1]}')
-        else:
-            unified_vars.append(token)
-
-    return ' '.join(unified_vars)
 
 
 def test(args):
     logger.info('start test')
 
     # TOKENIZER
-    tokom_extended_tokens = ['parallel', 'private', 'reduction']
+    with open(r'mpi/hf/mpi.code-snippets', 'r') as f:
+        file = json.load(f)
+    tokom_extended_tokens = [prefix.lower() for prefix in file.keys()]
 
     if args.is_replaced:
         tokenizer = TokompilerTokenizer(vocab_path=args.vocab_file)
@@ -71,17 +60,17 @@ def test(args):
         tokenizer.enable_padding(length=args.max_length)
     else:
         tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
-                                truncation=True, model_input_names=['input_ids'])
+                                  truncation=True, model_input_names=['input_ids'])
         tokenizer.pad_token = tokenizer.eos_token
 
-
     # DATA
-    datasets = data_omp.build_omp_dataset(args)
+    datasets = data_mpi.build_mpi_dataset(args)
 
     newd = []
     for i in range(len(datasets)):
         d = datasets[i]
-        outd = d.map(lambda examples: tokenize(args, tokenizer, examples), remove_columns=['pragma', 'code', 'hash', 'full'])     
+        outd = d.map(lambda examples: tokenize(args, tokenizer, examples),
+                     remove_columns=['program', 'code', 'mpi_labels', 'full'])
         newd.append(outd)
 
     traind, testd = newd
@@ -101,14 +90,13 @@ def test(args):
         collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)
         test_loader = DataLoader(dataset=testd, batch_size=1, collate_fn=collator)
 
-
-
     # MODEL
-    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, 'poly_parallel_replaced_bpe'))
+    model_name = 'mpi_poly_tokom' if args.is_replaced else 'mpi_poly_bpe'
+    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, model_name))
 
     model.to(args.device)
     model.eval()
-
+    print('Model has been loaded')
 
     progress_bar = tqdm(range(len(test_loader)))
 
@@ -117,32 +105,30 @@ def test(args):
     pred_table.align["Label"] = "l"
     pred_table.align["Pred"] = "l"
 
-    
     for batch_idx, batch in enumerate(test_loader):
-        # import pdb; pdb.set_trace()
-        tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask', 'attention_mask']}
+        tensor_batch = {k: v.to(args.device) for k, v in batch.items() if
+                        k in ['input_ids', 'labels', 'mask', 'attention_mask']}
 
         outputs = model(**tensor_batch)
         logits = outputs.logits
 
-        preds = torch.argmax(logits,dim=-1)
+        preds = torch.argmax(logits, dim=-1)
 
         if args.is_replaced:
-            preds = preds[preds!=1]
+            preds = preds[preds != 1]
         else:
-            preds = preds[preds!=50256]
+            preds = preds[preds != 50256]
 
         try:
             pred = tokenizer.decode(preds.tolist())
-            label =  tokenizer.decode(tensor_batch['input_ids'][0])
-        except:
-            pred = ''
+            label = tokenizer.decode(tensor_batch['input_ids'][0].tolist())
 
-        pred_table.add_row([label[label.rfind('parallel'):] if 'parallel' in label else 'None', 
-                            pred[pred.rfind('parallel'):] if 'parallel' in pred else 'None'])
+            pred_table.add_row([label[label.rfind('parallel'):] if 'parallel' in label else 'None',
+                                pred[pred.rfind('parallel'):] if 'parallel' in pred else 'None'])
+        except:
+            print('Decoder Error')
 
         progress_bar.update(1)
 
-    with open('results/poly_parallel_bpe_results.log', 'w') as f:
+    with open(f'results/{model_name}_results.log', 'w') as f:
         f.write(str(pred_table))
-

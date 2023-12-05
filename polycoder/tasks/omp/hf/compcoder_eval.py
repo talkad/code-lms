@@ -9,7 +9,7 @@ from tqdm.auto import tqdm
 from torch.nn.functional import cross_entropy, one_hot
 from torch.utils.data import DataLoader, Dataset
 from transformers import GPTNeoXForCausalLM
-from tokenizer import TokompilerTokenizer, _GPT2BPETokenizer
+from tokenizer.tokenizer import TokompilerTokenizer, _GPT2BPETokenizer
 from transformers import GPTNeoXForCausalLM, GPT2Tokenizer
 from transformers import DataCollatorForLanguageModeling
 import pygments
@@ -20,7 +20,6 @@ logger = logging.getLogger()
 lexer = get_lexer_by_name('c++')
 LEX_VOCAB=sum([len(v) for v in lexer.tokens.values()])
 logger.info(f'lex vocan amount is {LEX_VOCAB}')
-
 
 
 class CustomDataset(Dataset):
@@ -36,20 +35,17 @@ class CustomDataset(Dataset):
 
 
 def tokenize(args, tokenizer, sample):
-    max_size = 2048
-
     if not args.is_replaced:
-        encodings = tokenizer(sample['full'], max_length=max_size, add_special_tokens=True, truncation=True, padding=True)
+        encodings = tokenizer(sample['full'], max_length=args.max_length, add_special_tokens=True, truncation=True, padding=True)
 
-        if len(encodings['input_ids']) < max_size:
+        if len(encodings['input_ids']) < args.max_length:
             encodings['input_ids'].append(tokenizer.eos_token_id)
     else:
         encodings = {}
-        encodings['input_ids'] = tokenizer(sample['full'], max_length=max_size, add_special_tokens=True, truncation=True, padding=True)
+        encodings['input_ids'] = tokenizer(sample['full'], max_length=args.max_length, add_special_tokens=True, truncation=True, padding=True)
         encodings['labels'] = encodings['input_ids'][:]
 
     return encodings
-
 
 
 def calculate_metrics(logits, labels):
@@ -61,7 +57,6 @@ def calculate_metrics(logits, labels):
     return {'ce': ce}
 
 
-
 def eval(args):
     logger.info(f'start compcoder HPC evaluation {args.model_name}')
 
@@ -71,7 +66,7 @@ def eval(args):
     if args.is_replaced:
         tokenizer = TokompilerTokenizer(vocab_path=args.vocab_file)
         tokenizer.add_tokens(tokom_extended_tokens)
-        tokenizer.enable_padding(length=2048)
+        tokenizer.enable_padding(length=args.max_length)
     else:
         tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
                                 truncation=True, model_input_names=['input_ids'])

@@ -8,7 +8,6 @@ import torch
 import copy
 import json
 
-sys.path.append("../../tokenizer")
 from tokompiler.lexicalization import lexicalize
 
 
