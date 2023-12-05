@@ -108,7 +108,10 @@ def build_omp_dataset(args, rebuild=False):
                 sep_token = '\n'
                 eos_token = '' # eos equals to padding - appended it at tokenization
 
-            example["full"] = f'{code} {sep_token} parallel {pragma} {eos_token}'
+            if args.do_finetune:
+                example["full"] = f'{code} {sep_token} parallel {pragma} {eos_token}'
+            else:
+                example["full"] = code
 
             return example
 

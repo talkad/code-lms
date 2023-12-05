@@ -1,0 +1,833 @@
+[2023-12-05 18:10:22,259 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:10:22,259 | compcoder_eval.py | line 76] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:11:46,956 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:11:46,956 | compcoder_eval.py | line 76] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:11:48,824 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:11:48,830 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:11:49,515 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:11:49,518 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:11:49,523 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:11:49,596 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:11:49,599 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:15:52,179 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:15:52,179 | compcoder_eval.py | line 76] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:15:54,015 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:15:54,021 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:15:54,661 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:15:54,664 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:15:54,669 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:15:54,740 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:15:54,743 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:18:07,194 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:18:07,194 | compcoder_eval.py | line 76] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:18:09,103 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:18:09,108 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:18:09,748 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:18:09,750 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:18:09,755 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:18:09,826 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:18:09,829 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:21:26,640 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:21:26,640 | compcoder_eval.py | line 84] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:21:28,535 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:21:28,541 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:21:29,181 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:21:29,183 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:21:29,189 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:21:29,260 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:21:29,262 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:23:26,236 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:23:26,237 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:23:28,200 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:23:28,206 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:23:28,845 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:23:28,848 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:23:28,854 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:23:28,925 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:23:28,928 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:25:08,835 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:25:08,835 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:25:10,739 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:25:10,745 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:25:11,386 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:25:11,388 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:25:11,394 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:25:11,465 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:25:11,467 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:27:22,128 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:27:22,128 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:27:23,974 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:27:23,979 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:27:24,619 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:27:24,622 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:27:24,627 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:27:24,698 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:27:24,700 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:34:16,452 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:34:16,452 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:34:18,359 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:34:18,364 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:34:19,003 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:34:19,006 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:34:19,011 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:34:19,082 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:34:19,085 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:36:15,193 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:36:15,193 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:36:17,062 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:36:17,068 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:36:17,708 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:36:17,710 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:36:17,716 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:36:17,786 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:36:17,789 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:38:32,063 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:38:32,063 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:38:33,904 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:38:33,910 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:38:34,548 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:38:34,551 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:38:34,556 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:38:34,627 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:38:34,629 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:45:21,114 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:45:21,114 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:45:22,963 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:45:22,969 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:45:23,609 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:45:23,612 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:45:23,617 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:45:23,688 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:45:23,691 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:47:08,110 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:47:08,114 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:47:10,033 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:47:10,038 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:47:10,680 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:47:10,683 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:47:10,689 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:47:10,759 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:47:10,762 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:49:20,843 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:49:20,844 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:49:22,706 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:49:22,712 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:49:23,352 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:49:23,355 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:49:23,360 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:49:23,431 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:49:23,434 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:50:52,094 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:50:52,094 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:50:53,979 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:50:53,985 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:50:54,627 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:50:54,630 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:50:54,635 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:50:54,706 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:50:54,709 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:54:43,430 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:54:43,431 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:54:45,265 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:54:45,271 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:54:45,910 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:54:45,913 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:54:45,918 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:54:45,989 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:54:45,992 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 18:59:01,985 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 18:59:01,985 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 18:59:03,854 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 18:59:03,860 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 18:59:04,500 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 18:59:04,502 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 18:59:04,508 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 18:59:04,578 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 18:59:04,581 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 19:01:34,809 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 19:01:34,810 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 19:01:36,639 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 19:01:36,645 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 19:01:37,284 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 19:01:37,286 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 19:01:37,291 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 19:01:37,362 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 19:01:37,365 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 19:04:11,040 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 19:04:11,040 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 19:04:12,927 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 19:04:12,933 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 19:04:13,572 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 19:04:13,575 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 19:04:13,580 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 19:04:13,651 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 19:04:13,654 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-05 19:08:47,467 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_debug.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | False                                                 |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-05 19:08:47,467 | compcoder_eval.py | line 79] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-05 19:08:49,356 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-05 19:08:49,362 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-05 19:08:50,002 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-05 19:08:50,004 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-05 19:08:50,010 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-05 19:08:50,081 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-05 19:08:50,083 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json

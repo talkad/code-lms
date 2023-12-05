@@ -25,7 +25,7 @@ pred_table.align["Label"] = "l"
 pred_table.align["Pred"] = "l"
 
 
-with open('poly_parallel_bpe_results.log', 'r') as f, open('final_poly_parallel_replaced_bpe_results_clean.log', 'w') as out:
+with open('poly_parallel_tokom_results.log', 'r') as f, open('../final_results/poly_tokom.log', 'w') as out:
     lines = f.readlines()[3:-1]
     for idx, line in enumerate(lines):
         # print(idx, line)

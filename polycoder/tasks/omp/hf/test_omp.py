@@ -106,7 +106,7 @@ def test(args):
 
 
     # MODEL
-    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, 'poly_parallel_replaced_bpe'))
+    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, 'poly_parallel_tokom'))
 
     model.to(args.device)
     model.eval()
@@ -119,6 +119,9 @@ def test(args):
     pred_table.align["Label"] = "l"
     pred_table.align["Pred"] = "l"
 
+    post_process = lambda x: x
+    if args.is_replaced:
+        post_process = lambda x: concat_vars(x)
     
     for batch_idx, batch in enumerate(test_loader):
         # import pdb; pdb.set_trace()
@@ -128,23 +131,26 @@ def test(args):
         logits = outputs.logits
 
         preds = torch.argmax(logits,dim=-1)
+        labels = tensor_batch['input_ids'][0]
 
         if args.is_replaced:
             preds = preds[preds!=1]
+            labels = labels[labels!=1]
         else:
             preds = preds[preds!=50256]
+            labels = labels[labels!=50256]
 
         try:
             pred = tokenizer.decode(preds.tolist())
-            label =  tokenizer.decode(tensor_batch['input_ids'][0])
+            label =  tokenizer.decode(labels.tolist())
         except:
             pred = ''
 
-        pred_table.add_row([label[label.rfind('parallel'):] if 'parallel' in label else 'None', 
-                            pred[pred.rfind('parallel'):] if 'parallel' in pred else 'None'])
+        pred_table.add_row([post_process(label[label.rfind('parallel'):]) if 'parallel' in label else 'None', 
+                            post_process(pred[pred.rfind('parallel'):]) if 'parallel' in pred else 'None'])
 
         progress_bar.update(1)
 
-    with open('results/poly_parallel_bpe_results.log', 'w') as f:
+    with open('results/poly_parallel_tokom_results.log', 'w') as f:
         f.write(str(pred_table))
 
