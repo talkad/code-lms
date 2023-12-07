@@ -705,3 +705,87 @@
 [2023-12-05 20:15:21,001 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
 [2023-12-05 20:15:21,136 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
 [2023-12-05 20:15:21,139 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-06 16:36:03,892 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_tokom.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | True                                                  |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-06 16:36:03,892 | compcoder_eval.py | line 81] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-06 16:36:40,428 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-06 16:36:40,434 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-06 16:36:41,602 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-06 16:36:41,607 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-06 16:36:41,612 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-06 16:36:41,747 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-06 16:36:41,749 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json
+[2023-12-06 16:40:40,856 | main.py | line 87] - DEBUG: Configurations:
++------------------------------+-------------------------------------------------------+
+| Configuration                | Value                                                 |
++------------------------------+-------------------------------------------------------+
+| models_dir                   | /home/talkad/shared/models/hf_checkpoints             |
+| model_name                   | allc_gpt2tok_700M                                     |
+| do_finetune                  | False                                                 |
+| do_eval                      | True                                                  |
+| do_test                      | False                                                 |
+| device                       | cuda                                                  |
+| logger                       | eval_tokom.log                                        |
+| tokenizer_type               | GPT2BPETokenizer                                      |
+| vocab_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json |
+| merge_file                   | ../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt |
+| data_path                    | /home/talkad/LIGHTBITS_SHARE/OMP_Dataset              |
+| data_device                  | cpu                                                   |
+| is_replaced                  | True                                                  |
+| data_filename                | cpu_openmp_unique.jsonl                               |
+| save                         | True                                                  |
+| rank                         | 0                                                     |
+| make_vocab_size_divisible_by | 128                                                   |
+| model_parallel_size          | 1                                                     |
+| save_dir                     | outputs                                               |
+| batch_size                   | 1                                                     |
+| lr                           | 0.00016                                               |
+| warmup_steps                 | 400                                                   |
+| weight_decay                 | 0                                                     |
+| training_steps               | 100                                                   |
+| num_epochs                   | 1                                                     |
+| adam_beta1                   | 0.9                                                   |
+| adam_beta2                   | 0.999                                                 |
+| adam_eps                     | 1e-08                                                 |
+| freeze                       | False                                                 |
++------------------------------+-------------------------------------------------------+
+[2023-12-06 16:40:40,856 | compcoder_eval.py | line 81] - INFO: start compcoder HPC evaluation allc_gpt2tok_700M
+[2023-12-06 16:41:17,866 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/dataset_dict.json
+[2023-12-06 16:41:17,871 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/data-00000-of-00001.arrow
+[2023-12-06 16:41:19,040 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/state.json
+[2023-12-06 16:41:19,045 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/train/dataset_info.json
+[2023-12-06 16:41:19,050 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/data-00000-of-00001.arrow
+[2023-12-06 16:41:19,185 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/state.json
+[2023-12-06 16:41:19,187 | local.py | line 294] - DEBUG: open file: /home/talkad/LIGHTBITS_SHARE/OMP_Dataset/test/dataset_info.json

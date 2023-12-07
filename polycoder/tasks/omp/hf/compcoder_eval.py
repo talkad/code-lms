@@ -124,8 +124,8 @@ def eval(args):
     # get model
     # model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))    
     
-    # model = GPTNeoXForCausalLM.from_pretrained('/home/talkad/shared/models/hf_checkpoints/allc_tokom_700M')
-    model = GPTNeoXForCausalLM.from_pretrained('/mnt/lbosm1/home/Share/code-lms/polycoder/tasks/omp/hf/outputs/poly_parallel_tokom') 
+    model = GPTNeoXForCausalLM.from_pretrained('/home/talkad/shared/models/hf_checkpoints/allc_gpt2tok_700M')
+    # model = GPTNeoXForCausalLM.from_pretrained('/mnt/lbosm1/home/Share/code-lms/polycoder/tasks/omp/hf/outputs/poly_parallel_bpe') 
     model.eval()
     
 
@@ -142,12 +142,19 @@ def eval(args):
     
     for epoch in range(args.num_epochs):
         for batch_idx, batch in enumerate(test_loader):
-            # import pdb; pdb.set_trace()
+            import pdb; pdb.set_trace()
             
             tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask']}
 
-            outputs = model(**tensor_batch)
+            outputs = model(input_ids=tensor_batch['input_ids'])
             logits = outputs.logits
+            preds = torch.argmax(logits,dim=-1)
+            print(tokenizer.decode(preds[0].tolist()))
+
+            outputs = model.generate(input_ids=tensor_batch['input_ids'], max_new_tokens=2048)
+            logits = outputs.logits
+            preds = torch.argmax(logits,dim=-1)
+            print(tokenizer.decode(preds[0].tolist()))
 
             metrics = calculate_metrics(logits, tensor_batch['input_ids'], tokenizer)
 
@@ -158,7 +165,7 @@ def eval(args):
 
             total_ce += metrics['ce'].item()
 
-            # if tokens_amount < 200:
+            # if tokens_amount < 400:
             total_bleu += metrics['bleu']
             total_acc = metrics['acc']
             num_token += tokens_amount

@@ -7,6 +7,5 @@ python main.py      --do_eval                                                   
                     --num_epochs 1                                                      \
                     --device cuda                                                       \
                     --data_filename cpu_openmp_unique.jsonl                             \
-                    --vocab_file /mnt/lbosm1/home/Share/code-lms/polycoder/tasks/tokenizer/tokompiler/tokenizer_vocab/vocab.txt     \
                     --tokenizer_type GPT2BPETokenizer                                   \
                     --logger eval_debug.log
