@@ -4,3 +4,6 @@
 [submodule "polycoder_huggingface"]
 	path = polycoder_huggingface
 	url = https://github.com/nevakrien/polycoder_huggingface
+[submodule "polycoder/tasks/omp/hf/generations/analysis/CodeXGLUE"]
+	path = polycoder/tasks/omp/hf/generations/analysis/CodeXGLUE
+	url = https://github.com/microsoft/CodeXGLUE
