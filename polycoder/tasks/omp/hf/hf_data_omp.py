@@ -42,6 +42,16 @@ def pragma2dict(pragma):
 
     return result
 
+def remove_pragma(code):
+    buf = []
+
+    for line in code.split('\n'):
+        if line.lstrip().startswith('#pragma'):
+            continue
+
+        buf.append(line)
+
+    return '\n'.join(buf)
 
 def read_jsonl(file_path):
     with open(file_path, 'r') as f:
@@ -75,11 +85,18 @@ def build_omp_dataset(args, rebuild=False):
             "hash": Value("string"),
         })
         
-        train_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'train.jsonl')
-        test_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'test.jsonl')
+        if args.do_eval:
+            train_data_path = os.path.join(args.data_path, 'HPCorpus_omp_replaced.jsonl')
+            test_data_path = os.path.join(args.data_path, 'HPCorpus_omp_replaced.jsonl')
 
-        train_dataset = read_jsonl(train_data_path)
-        test_dataset = read_jsonl(test_data_path)
+            train_dataset = read_jsonl(train_data_path)[:500]
+            test_dataset = read_jsonl(test_data_path)[:500]
+        else:
+            train_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'train.jsonl')
+            test_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'test.jsonl')
+
+            train_dataset = read_jsonl(train_data_path)
+            test_dataset = read_jsonl(test_data_path)
 
         columns = train_dataset[0].keys()
         train_dataset = trd.Dataset.from_dict({col: [item[col] for item in train_dataset] for col in columns})
@@ -94,24 +111,25 @@ def build_omp_dataset(args, rebuild=False):
             if args.is_replaced:
                 code = lexicalize(code, replaced=True)
 
-            pragma = example["pragma"]
-            pragma = pragma.replace('parallel', '')
-            pragma = pragma.replace('omp', '')
-            pragma = pragma.replace('(', ' ( ').replace(')', ' ) ').replace(':', ' : ').replace(',', ' , ')
-            if args.is_replaced:
-                pragma = pragma.replace('_', ' ')
-
-            if args.is_replaced:
-                sep_token = '[SEP]'
-                eos_token = '[EOS]'
-            else:
-                sep_token = '\n'
-                eos_token = '' # eos equals to padding - appended it at tokenization
-
-            if args.do_finetune:
-                example["full"] = f'{code} {sep_token} parallel {pragma} {eos_token}'
-            else:
+            if args.do_eval or args.do_test:
                 example["full"] = code
+            else:
+
+                pragma = example["pragma"]
+                pragma = pragma.replace('parallel', '')
+                pragma = pragma.replace('omp', '')
+                pragma = pragma.replace('(', ' ( ').replace(')', ' ) ').replace(':', ' : ').replace(',', ' , ')
+                if args.is_replaced:
+                    pragma = pragma.replace('_', ' ')
+
+                if args.is_replaced:
+                    sep_token = '[SEP]'
+                    eos_token = '[EOS]'
+                else:
+                    sep_token = '\n'
+                    eos_token = '' # eos equals to padding - appended it at tokenization
+
+                example["full"] = f'{code} {sep_token} parallel {pragma} {eos_token}'
 
             return example
 

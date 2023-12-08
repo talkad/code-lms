@@ -1,6 +1,7 @@
 import os
 import torch
 import math
+import json
 import logging
 import hf_data_omp as data_omp
 from torch.optim import AdamW
@@ -11,6 +12,7 @@ from torch.utils.data import DataLoader, Dataset
 from transformers import GPTNeoXForCausalLM
 from tokenizer import TokompilerTokenizer, _GPT2BPETokenizer
 from transformers import GPTNeoXForCausalLM, GPT2Tokenizer
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from transformers import DataCollatorForLanguageModeling
 import pygments
 from pygments.lexers import get_lexer_by_name
@@ -53,18 +55,13 @@ def tokenize(args, tokenizer, sample):
     return encodings
 
 
-
-def calculate_metrics(logits, labels, tokenizer):
-    y = labels
-    logits = logits
-
-    ce = cross_entropy(logits, one_hot(y, num_classes=logits.shape[-1]).to(torch.float32), reduction='sum')
-
+def decode(logits, labels, tokenizer, ignore_token_id, is_replaced=False):
     pred, label = [], []
 
-    preds = torch.argmax(logits,dim=-1)
+    # preds = torch.argmax(logits,dim=-1)
+    preds = logits
    
-    labels = labels[labels!=1]
+    labels = labels[labels!=ignore_token_id]
     preds = preds[0][:len(labels)]
 
     for token_id in preds.tolist():
@@ -73,7 +70,27 @@ def calculate_metrics(logits, labels, tokenizer):
     for token_id in labels.tolist():
         label.append(tokenizer.decode([token_id]))
 
-    return {'ce': ce, 'bleu': sentence_bleu([label], pred), 'acc': torch.sum(labels==preds).item()/len(preds)}
+    if is_replaced:
+        is_not_special = lambda token: token not in tokenizer.tokenizer.special_tokens
+        label = list(filter(is_not_special, label))
+        pred = pred[:len(label)]
+
+    return pred, label
+
+
+def calculate_metrics(logits, labels, tokenizer, ignore_token_id=1):
+    y = labels
+    logits = logits
+
+    ce = cross_entropy(logits, one_hot(y, num_classes=logits.shape[-1]).to(torch.float32), reduction='sum')
+
+    pred, label = decode(logits, labels, tokenizer, ignore_token_id)
+
+    return {'ce': ce, 
+            'bleu': sentence_bleu([label], pred), 
+            'code_bleu' : 0, 
+            'code_bert': 0, 
+            'acc': torch.sum(labels==preds).item()/len(preds)}
 
 
 
@@ -88,9 +105,12 @@ def eval(args):
         tokenizer.add_tokens(tokom_extended_tokens)
         tokenizer.enable_padding(length=2048)
     else:
-        tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
-                                truncation=True, model_input_names=['input_ids'])
-        tokenizer.pad_token = tokenizer.eos_token
+        tokenizer = AutoTokenizer.from_pretrained("NinedayWang/PolyCoder-2.7B", 
+                                  truncation=True, model_input_names=['input_ids'])
+        # tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
+        #                         truncation=True, model_input_names=['input_ids'])
+        # tokenizer.pad_token = tokenizer.eos_token
+        tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 
 
     # DATA
@@ -100,7 +120,7 @@ def eval(args):
     newd = []
     for i in range(len(datasets)):
         d = datasets[i]
-        outd = d.map(lambda examples: tokenize(args, tokenizer, examples), remove_columns=['pragma', 'code', 'hash', 'full'])     
+        outd = d.map(lambda examples: tokenize(args, tokenizer, examples), remove_columns=['code', 'full'])     
         newd.append(outd)
 
     traind, testd = newd
@@ -123,8 +143,8 @@ def eval(args):
 
     # get model
     # model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))    
-    
-    model = GPTNeoXForCausalLM.from_pretrained('/home/talkad/shared/models/hf_checkpoints/allc_gpt2tok_700M')
+    # model = AutoModelForCausalLM.from_pretrained("NinedayWang/PolyCoder-2.7B", torch_dtype=torch.float16)
+    model = GPTNeoXForCausalLM.from_pretrained('/home/talkad/shared/models/hf_checkpoints/allc_tokom_700M')
     # model = GPTNeoXForCausalLM.from_pretrained('/mnt/lbosm1/home/Share/code-lms/polycoder/tasks/omp/hf/outputs/poly_parallel_bpe') 
     model.eval()
     
@@ -132,6 +152,7 @@ def eval(args):
     model.to(args.device)
 
     # EVAL
+    context_size = 300
     progress_bar = tqdm(range(args.num_epochs * len(test_loader)))
 
     total_ce, total_tokens = 0.0, 0
@@ -142,42 +163,66 @@ def eval(args):
     
     for epoch in range(args.num_epochs):
         for batch_idx, batch in enumerate(test_loader):
-            import pdb; pdb.set_trace()
-            
+            # import pdb; pdb.set_trace()
             tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask']}
-
-            outputs = model(input_ids=tensor_batch['input_ids'])
-            logits = outputs.logits
-            preds = torch.argmax(logits,dim=-1)
-            print(tokenizer.decode(preds[0].tolist()))
-
-            outputs = model.generate(input_ids=tensor_batch['input_ids'], max_new_tokens=2048)
-            logits = outputs.logits
-            preds = torch.argmax(logits,dim=-1)
-            print(tokenizer.decode(preds[0].tolist()))
-
-            metrics = calculate_metrics(logits, tensor_batch['input_ids'], tokenizer)
-
-            preds = tensor_batch['input_ids'][tensor_batch['input_ids']!=1]
-            tokens_amount = preds.shape[-1]
             
-            total_tokens += len(list(pygments.lex(codes[batch_idx], lexer)))
+            input_ids = tensor_batch['input_ids']
+            mask = torch.ones_like(input_ids)
 
-            total_ce += metrics['ce'].item()
+            if args.is_replaced:
+                mask[input_ids==tokenizer.pad_id] = 0
+                mask[input_ids==tokenizer.eod] = 0
+            else:
+                mask[input_ids==tokenizer.eos_token_id] = 0
 
-            # if tokens_amount < 400:
-            total_bleu += metrics['bleu']
-            total_acc = metrics['acc']
+            input_ids = input_ids[mask==1]
+            tokens_amount = tensor_batch['input_ids'].shape[-1]
             num_token += tokens_amount
-            steps += 1
+
+            # ### PPL and Accracy ########################################################
+            # outputs = model(input_ids=tensor_batch['input_ids'])
+            # logits = outputs.logits
+            # preds = torch.argmax(logits,dim=-1)
+            # print(tokenizer.decode(preds[0].tolist()))
+
+            # metrics = calculate_metrics(logits, tensor_batch['input_ids'], tokenizer)
+
+            # preds = tensor_batch['input_ids'][tensor_batch['input_ids']!=1]
+            
+            # total_tokens += len(list(pygments.lex(codes[batch_idx], lexer)))
+
+            # total_ce += metrics['ce'].item()
+
+            # # if tokens_amount < 400:
+            # total_bleu += metrics['bleu']
+            # total_acc = metrics['acc']
+            # ############################################################################
+
+            input_ids = tensor_batch['input_ids'][:, :context_size]
+            mask = mask[:, :context_size]
+
+            try:
+                outputs = model.generate(input_ids=input_ids, attention_mask=mask, max_new_tokens=max(0, tokens_amount-context_size))
+                logits = outputs
+                
+                pred, label = decode(logits, tensor_batch['input_ids'], tokenizer, tokenizer.eod if args.is_replaced else tokenizer.eos_token_id, is_replaced=args.is_replaced)
+
+                with open(f'generations/compcoder_tokom_{context_size}.jsonl', 'a+') as f:
+                    sep = ' ' if args.is_replaced else ''
+                    f.write(json.dumps({'label': sep.join(label),
+                                        'pred': sep.join(pred)}) + '\n')
+                
+                steps += 1
+            except Exception as e:
+                print(e)
 
             if (batch_idx + 1) % batches_to_print == 0:
                 ce_tensor = torch.tensor(total_ce)
                 perplexity=torch.exp(ce_tensor/(total_tokens*LEX_VOCAB))
                 # print(total_ce , num_token)
                 # print(f'PPL = {perplexity} | {math.exp(total_ce/num_token)}')
-                print(f'BLEU = {total_bleu/steps} ')
-                print(f'ACC = {total_acc/steps} ')
+                # print(f'BLEU = {total_bleu/steps} ') 
+                # print(f'ACC = {total_acc/steps} ')
                 print(f'AVG TOKENS = {num_token/steps}')
                 
             progress_bar.update(1)

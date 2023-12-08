@@ -8,4 +8,5 @@ python main.py      --do_eval                                                   
                     --device cuda                                                       \
                     --data_filename cpu_openmp_unique.jsonl                             \
                     --tokenizer_type GPT2BPETokenizer                                   \
+                    --data_path  /home/talkad/LIGHTBITS_SHARE                           \
                     --logger eval_debug.log

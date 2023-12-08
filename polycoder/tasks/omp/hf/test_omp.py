@@ -127,8 +127,8 @@ def test(args):
         # import pdb; pdb.set_trace()
         tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask', 'attention_mask']}
 
-        outputs = model.generate(input_ids=tensor_batch['input_ids'], max_new_tokens=248)
-        logits = outputs.logits
+        outputs = model.generate(input_ids=tensor_batch['input_ids'], max_new_tokens=256)
+        logits = outputs[0]
 
         preds = torch.argmax(logits,dim=-1)
         labels = tensor_batch['input_ids'][0]
