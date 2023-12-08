@@ -176,7 +176,7 @@ def eval(args):
                 mask[input_ids==tokenizer.eos_token_id] = 0
 
             input_ids = input_ids[mask==1]
-            tokens_amount = tensor_batch['input_ids'].shape[-1]
+            tokens_amount = input_ids.shape[-1]
             num_token += tokens_amount
 
             # ### PPL and Accracy ########################################################

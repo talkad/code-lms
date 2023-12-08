@@ -153,4 +153,5 @@ test_logs/
 logs/
 tensorboard/
 src/
+tree-sitter-*/
 **/outputs

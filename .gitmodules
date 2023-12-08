@@ -7,3 +7,6 @@
 [submodule "polycoder/tasks/omp/hf/generations/analysis/CodeXGLUE"]
 	path = polycoder/tasks/omp/hf/generations/analysis/CodeXGLUE
 	url = https://github.com/microsoft/CodeXGLUE
+[submodule "polycoder/tasks/omp/hf/generations/analysis/code_bert_score"]
+	path = polycoder/tasks/omp/hf/generations/analysis/code_bert_score
+	url = https://github.com/neulab/code-bert-score
