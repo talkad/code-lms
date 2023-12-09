@@ -127,7 +127,16 @@ def test(args):
         # import pdb; pdb.set_trace()
         tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask', 'attention_mask']}
 
-        outputs = model.generate(input_ids=tensor_batch['input_ids'], max_new_tokens=256)
+        input_ids = tensor_batch['input_ids']
+        mask = torch.ones_like(input_ids)
+
+        if args.is_replaced:
+            mask[input_ids==tokenizer.pad_id] = 0
+            mask[input_ids==tokenizer.eod] = 0
+        else:
+            mask[input_ids==tokenizer.eos_token_id] = 0
+
+        outputs = model.generate(input_ids=input_ids, attention_mask=mask, max_new_tokens=256)
         logits = outputs[0]
 
         preds = torch.argmax(logits,dim=-1)

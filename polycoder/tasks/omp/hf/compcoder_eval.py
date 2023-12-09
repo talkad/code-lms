@@ -105,10 +105,10 @@ def eval(args):
         tokenizer.add_tokens(tokom_extended_tokens)
         tokenizer.enable_padding(length=2048)
     else:
-        tokenizer = AutoTokenizer.from_pretrained("NinedayWang/PolyCoder-2.7B", 
-                                  truncation=True, model_input_names=['input_ids'])
-        # tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
-        #                         truncation=True, model_input_names=['input_ids'])
+        # tokenizer = AutoTokenizer.from_pretrained("NinedayWang/PolyCoder-2.7B", 
+        #                           truncation=True, model_input_names=['input_ids'])
+        tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
+                                truncation=True, model_input_names=['input_ids'])
         # tokenizer.pad_token = tokenizer.eos_token
         tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 
@@ -145,14 +145,14 @@ def eval(args):
     # model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))    
     # model = AutoModelForCausalLM.from_pretrained("NinedayWang/PolyCoder-2.7B", torch_dtype=torch.float16)
     model = GPTNeoXForCausalLM.from_pretrained('/home/talkad/shared/models/hf_checkpoints/allc_tokom_700M')
-    # model = GPTNeoXForCausalLM.from_pretrained('/mnt/lbosm1/home/Share/code-lms/polycoder/tasks/omp/hf/outputs/poly_parallel_bpe') 
+
     model.eval()
     
 
     model.to(args.device)
 
     # EVAL
-    context_size = 300
+    context_size = 600
     progress_bar = tqdm(range(args.num_epochs * len(test_loader)))
 
     total_ce, total_tokens = 0.0, 0

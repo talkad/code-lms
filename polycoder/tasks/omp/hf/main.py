@@ -30,7 +30,7 @@ if __name__=='__main__':
     parser.add_argument('--do_finetune', action='store_true', help='Whether to finetune')
     parser.add_argument('--do_eval', action='store_true', help='Whether to evaluation')
     parser.add_argument('--do_test', action='store_true', help='Whether to test')
-    parser.add_argument('--device', default='cuda', choices=['cpu', 'cuda'], help='Specify the device (cpu or cuda)')
+    parser.add_argument('--device', default='cuda', choices=['cpu', 'cuda', 'cuda:0', 'cuda:1'], help='Specify the device (cpu or cuda)')
     parser.add_argument('--logger', default='info.log', help='Set logger file name')
 
     # Data arguments

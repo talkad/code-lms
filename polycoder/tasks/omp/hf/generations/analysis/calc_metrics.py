@@ -17,8 +17,23 @@ def tokenize(code, is_replaced=False):
         return tokenizer.tokenize(code)
     
 
+def concat_vars(code):
+    buf = []
+    tokens = code.split()
 
-generation_file = '/mnt/lbosm1/home/Share/OMPify/CompCoder/comparison_models/GPT3.5_Turbo/context_600.jsonl'
+    for idx, token in enumerate(tokens):
+        if token.isnumeric():
+            continue
+
+        if token in ['var', 'arr', 'struct', 'arg'] and idx < len(tokens) - 1 and tokens[idx + 1].isnumeric():
+            buf.append(f'{token}_{tokens[idx + 1]}')
+        else:
+            buf.append(token)
+
+    return ' '.join(buf)
+
+is_replaced = False
+generation_file = '/mnt/lbosm1/home/Share/code-lms/polycoder/tasks/omp/hf/generations/compcoder_tokom_600.jsonl'
 total_bleu, total_code_bleu, total_code_bert = 0, 0, 0
 
 with open(generation_file, 'r') as f:
@@ -28,7 +43,12 @@ with open(generation_file, 'r') as f:
         label = js['label']
         pred = js['pred']
 
-        total_bleu += calc_bleu(tokenize(pred), tokenize(label))
+        total_bleu += calc_bleu(tokenize(pred, is_replaced=is_replaced), tokenize(label, is_replaced=is_replaced))
+
+        if is_replaced:
+            pred = concat_vars(pred)
+            label = concat_vars(label)
+
         total_code_bleu += calc_code_bleu(pred, label)
         total_code_bert += calc_code_bert_score(pred, label)
 

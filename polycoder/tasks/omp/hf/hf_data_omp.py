@@ -112,6 +112,8 @@ def build_omp_dataset(args, rebuild=False):
                 code = lexicalize(code, replaced=True)
 
             if args.do_eval or args.do_test:
+                # TODO: only for eval
+                code = remove_pragma(code)
                 example["full"] = code
             else:
 
