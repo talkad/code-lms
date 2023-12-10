@@ -105,10 +105,10 @@ def eval(args):
         tokenizer.add_tokens(tokom_extended_tokens)
         tokenizer.enable_padding(length=2048)
     else:
-        # tokenizer = AutoTokenizer.from_pretrained("NinedayWang/PolyCoder-2.7B", 
-        #                           truncation=True, model_input_names=['input_ids'])
-        tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
-                                truncation=True, model_input_names=['input_ids'])
+        tokenizer = AutoTokenizer.from_pretrained("NinedayWang/PolyCoder-2.7B", 
+                                  truncation=True, model_input_names=['input_ids'])
+        # tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
+        #                         truncation=True, model_input_names=['input_ids'])
         # tokenizer.pad_token = tokenizer.eos_token
         tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 
@@ -143,8 +143,8 @@ def eval(args):
 
     # get model
     # model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))    
-    # model = AutoModelForCausalLM.from_pretrained("NinedayWang/PolyCoder-2.7B", torch_dtype=torch.float16)
-    model = GPTNeoXForCausalLM.from_pretrained('/home/talkad/shared/models/hf_checkpoints/allc_tokom_700M')
+    model = AutoModelForCausalLM.from_pretrained("NinedayWang/PolyCoder-2.7B", torch_dtype=torch.float16)
+    # model = GPTNeoXForCausalLM.from_pretrained('/home/talkad/shared/models/hf_checkpoints/allc_tokom_700M')
 
     model.eval()
     
@@ -207,7 +207,7 @@ def eval(args):
                 
                 pred, label = decode(logits, tensor_batch['input_ids'], tokenizer, tokenizer.eod if args.is_replaced else tokenizer.eos_token_id, is_replaced=args.is_replaced)
 
-                with open(f'generations/compcoder_tokom_{context_size}.jsonl', 'a+') as f:
+                with open(f'generations/compcoder_bpe_{context_size}_debuggg.jsonl', 'a+') as f:
                     sep = ' ' if args.is_replaced else ''
                     f.write(json.dumps({'label': sep.join(label),
                                         'pred': sep.join(pred)}) + '\n')
