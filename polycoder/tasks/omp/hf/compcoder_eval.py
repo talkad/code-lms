@@ -21,9 +21,9 @@ from nltk.translate.bleu_score import sentence_bleu
 
 
 logger = logging.getLogger()
-lexer = get_lexer_by_name('c++')
+lexer = get_lexer_by_name('cpp')
 LEX_VOCAB=sum([len(v) for v in lexer.tokens.values()])
-logger.info(f'lex vocan amount is {LEX_VOCAB}')
+logger.info(f' --- lex vocab amount is {LEX_VOCAB}')
 
 
 
@@ -84,13 +84,13 @@ def calculate_metrics(logits, labels, tokenizer, ignore_token_id=1):
 
     ce = cross_entropy(logits, one_hot(y, num_classes=logits.shape[-1]).to(torch.float32), reduction='sum')
 
-    pred, label = decode(logits, labels, tokenizer, ignore_token_id)
+    # pred, label = decode(logits, labels, tokenizer, ignore_token_id)
 
-    return {'ce': ce, 
-            'bleu': sentence_bleu([label], pred), 
-            'code_bleu' : 0, 
-            'code_bert': 0, 
-            'acc': torch.sum(labels==preds).item()/len(preds)}
+    return {'ce': ce}
+            # 'bleu': sentence_bleu([label], pred), 
+            # 'code_bleu' : 0, 
+            # 'code_bert': 0, 
+            # 'acc': torch.sum(labels==preds).item()/len(preds)}
 
 
 
@@ -143,11 +143,11 @@ def eval(args):
 
     # get model
     # model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))    
-    model = AutoModelForCausalLM.from_pretrained("NinedayWang/PolyCoder-2.7B", torch_dtype=torch.float16)
-    # model = GPTNeoXForCausalLM.from_pretrained('/home/talkad/shared/models/hf_checkpoints/allc_tokom_700M')
+    # model = AutoModelForCausalLM.from_pretrained("NinedayWang/PolyCoder-2.7B", torch_dtype=torch.float16)
+    model = GPTNeoXForCausalLM.from_pretrained('/home/talkad/shared/models/hf_checkpoints/allc_gpt2tok_700M')
 
     model.eval()
-    
+    import pdb; pdb.set_trace()
 
     model.to(args.device)
 
@@ -163,7 +163,6 @@ def eval(args):
     
     for epoch in range(args.num_epochs):
         for batch_idx, batch in enumerate(test_loader):
-            # import pdb; pdb.set_trace()
             tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask']}
             
             input_ids = tensor_batch['input_ids']
@@ -180,22 +179,24 @@ def eval(args):
             num_token += tokens_amount
 
             # ### PPL and Accracy ########################################################
-            # outputs = model(input_ids=tensor_batch['input_ids'])
+            # # import pdb; pdb.set_trace()
+            # outputs = model(input_ids=tensor_batch['input_ids'][:,:2048])
             # logits = outputs.logits
             # preds = torch.argmax(logits,dim=-1)
-            # print(tokenizer.decode(preds[0].tolist()))
+            # # print(tokenizer.decode(preds[0].tolist()))
 
-            # metrics = calculate_metrics(logits, tensor_batch['input_ids'], tokenizer)
+            # metrics = calculate_metrics(logits, tensor_batch['input_ids'][:,:2048], tokenizer)
 
             # preds = tensor_batch['input_ids'][tensor_batch['input_ids']!=1]
+
+            # code = tokenizer.decode(tensor_batch['input_ids'][0,:2048][:-1])
             
-            # total_tokens += len(list(pygments.lex(codes[batch_idx], lexer)))
+            # total_tokens += len(list(pygments.lex(code, lexer)))
 
             # total_ce += metrics['ce'].item()
 
-            # # if tokens_amount < 400:
-            # total_bleu += metrics['bleu']
-            # total_acc = metrics['acc']
+            # # total_bleu += metrics['bleu']
+            # # total_acc = metrics['acc']
             # ############################################################################
 
             input_ids = tensor_batch['input_ids'][:, :context_size]
@@ -207,20 +208,21 @@ def eval(args):
                 
                 pred, label = decode(logits, tensor_batch['input_ids'], tokenizer, tokenizer.eod if args.is_replaced else tokenizer.eos_token_id, is_replaced=args.is_replaced)
 
-                with open(f'generations/compcoder_bpe_{context_size}_debuggg.jsonl', 'a+') as f:
+                with open(f'generations/polycoder_replaced_{context_size}.jsonl', 'a+') as f:
                     sep = ' ' if args.is_replaced else ''
                     f.write(json.dumps({'label': sep.join(label),
                                         'pred': sep.join(pred)}) + '\n')
                 
-                steps += 1
             except Exception as e:
                 print(e)
+
+            steps += 1
 
             if (batch_idx + 1) % batches_to_print == 0:
                 ce_tensor = torch.tensor(total_ce)
                 perplexity=torch.exp(ce_tensor/(total_tokens*LEX_VOCAB))
-                # print(total_ce , num_token)
-                # print(f'PPL = {perplexity} | {math.exp(total_ce/num_token)}')
+                print(total_ce , num_token)
+                print(f'PPL = {perplexity} | {math.exp(total_ce/num_token)}')
                 # print(f'BLEU = {total_bleu/steps} ') 
                 # print(f'ACC = {total_acc/steps} ')
                 print(f'AVG TOKENS = {num_token/steps}')

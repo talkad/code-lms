@@ -56,7 +56,8 @@ def remove_pragma(code):
 def read_jsonl(file_path):
     with open(file_path, 'r') as f:
         lines = f.readlines()
-    return [json.loads(line.strip()) for line in lines if 'for' in line]
+    # return [json.loads(line.strip()) for line in lines if 'for' in line]
+    return [json.loads(line.strip()) for line in lines]
 
 
 def build_omp_dataset(args, rebuild=False):
@@ -86,11 +87,11 @@ def build_omp_dataset(args, rebuild=False):
         })
         
         if args.do_eval:
-            train_data_path = os.path.join(args.data_path, 'HPCorpus_omp.jsonl')
-            test_data_path = os.path.join(args.data_path, 'HPCorpus_omp.jsonl')
+            train_data_path = os.path.join(args.data_path, 'HPCorpus_omp_replaced.jsonl')
+            test_data_path = os.path.join(args.data_path, 'HPCorpus_omp_replaced.jsonl')
 
-            train_dataset = read_jsonl(train_data_path)[:500]
-            test_dataset = read_jsonl(test_data_path)[:500]
+            train_dataset = read_jsonl(train_data_path)[:1500]
+            test_dataset = read_jsonl(test_data_path)[:1500]
         else:
             train_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'train.jsonl')
             test_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'test.jsonl')
@@ -106,14 +107,12 @@ def build_omp_dataset(args, rebuild=False):
         
 
         def tokenize_and_parse(example, eos_token=eos_token):
-
-            code = example["code"]
+            code = remove_pragma(example["code"])
             if args.is_replaced:
                 code = lexicalize(code, replaced=True)
 
             if args.do_eval or args.do_test:
-                # TODO: only for eval
-                code = remove_pragma(code)
+                code = code
                 example["full"] = code
             else:
 

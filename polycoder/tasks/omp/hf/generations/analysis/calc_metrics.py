@@ -33,7 +33,7 @@ def concat_vars(code):
     return ' '.join(buf)
 
 is_replaced = False
-generation_file = '/mnt/lbosm1/home/Share/code-lms/polycoder/tasks/omp/hf/generations/compcoder_tokom_600.jsonl'
+generation_file = '/mnt/lbosm1/home/Share/code-lms/polycoder/tasks/omp/hf/generations/polycoder_replaced_600.jsonl'
 total_bleu, total_code_bleu, total_code_bert = 0, 0, 0
 
 with open(generation_file, 'r') as f:
@@ -43,22 +43,22 @@ with open(generation_file, 'r') as f:
         label = js['label']
         pred = js['pred']
 
-        total_bleu += calc_bleu(tokenize(pred, is_replaced=is_replaced), tokenize(label, is_replaced=is_replaced))
+        # total_bleu += calc_bleu(tokenize(pred, is_replaced=is_replaced), tokenize(label, is_replaced=is_replaced))
 
         if is_replaced:
             pred = concat_vars(pred)
             label = concat_vars(label)
 
         total_code_bleu += calc_code_bleu(pred, label)
-        total_code_bert += calc_code_bert_score(pred, label)
+        # total_code_bert += calc_code_bert_score(pred, label)
 
         print(f'Bleu: {total_bleu/idx}')
         print(f'CodeBleu: {total_code_bleu/idx}')
-        print(f'CodeBERTScore: {total_code_bert/idx}')
+        # print(f'CodeBERTScore: {total_code_bert/idx}')
 
-    print(f'Bleu: {total_bleu/500}')
-    print(f'CodeBleu: {total_code_bleu/500}')
-    print(f'CodeBERTScore: {total_code_bert/500}')
+    # print(f'Bleu: {total_bleu/500}')
+    # print(f'CodeBleu: {total_code_bleu/500}')
+    # print(f'CodeBERTScore: {total_code_bert/500}')
 
 
 

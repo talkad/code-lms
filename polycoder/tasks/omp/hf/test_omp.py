@@ -106,7 +106,7 @@ def test(args):
 
 
     # MODEL
-    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, 'poly_parallel_tokom'))
+    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.save_dir, 'compcoder_bpe'))
 
     model.to(args.device)
     model.eval()
