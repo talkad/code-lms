@@ -229,7 +229,3 @@ def eval(args):
                 
             progress_bar.update(1)
 
-    # ce_tensor = torch.tensor(total_ce)
-    # perplexity=torch.exp(ce_tensor/(total_tokens*LEX_VOCAB))
-    # print(f'PPL = {perplexity}')
-

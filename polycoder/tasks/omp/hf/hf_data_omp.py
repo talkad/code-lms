@@ -90,8 +90,8 @@ def build_omp_dataset(args, rebuild=False):
             train_data_path = os.path.join(args.data_path, 'HPCorpus_omp_replaced.jsonl')
             test_data_path = os.path.join(args.data_path, 'HPCorpus_omp_replaced.jsonl')
 
-            train_dataset = read_jsonl(train_data_path)[:1500]
-            test_dataset = read_jsonl(test_data_path)[:1500]
+            train_dataset = read_jsonl(train_data_path)
+            test_dataset = read_jsonl(test_data_path)
         else:
             train_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'train.jsonl')
             test_data_path = os.path.join(args.data_path, args.data_device, 'replaced' if args.is_replaced else 'source', 'test.jsonl')

@@ -56,9 +56,6 @@ with open(generation_file, 'r') as f:
         print(f'CodeBleu: {total_code_bleu/idx}')
         # print(f'CodeBERTScore: {total_code_bert/idx}')
 
-    # print(f'Bleu: {total_bleu/500}')
-    # print(f'CodeBleu: {total_code_bleu/500}')
-    # print(f'CodeBERTScore: {total_code_bert/500}')
 
 
 
