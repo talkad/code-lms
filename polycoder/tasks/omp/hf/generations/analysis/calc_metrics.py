@@ -5,7 +5,6 @@ from metrics import *
 from transformers import GPT2Tokenizer
 
 
-
 tokenizer = GPT2Tokenizer(vocab_file='../../../../../megatron/tokenizer/gpt_vocab/gpt2-vocab.json', 
                                 merges_file='../../../../../megatron/tokenizer/gpt_vocab/gpt2-merges.txt')
 
@@ -33,7 +32,7 @@ def concat_vars(code):
     return ' '.join(buf)
 
 is_replaced = False
-generation_file = '/mnt/lbosm1/home/Share/code-lms/polycoder/tasks/omp/hf/generations/polycoder_replaced_600.jsonl'
+generation_file = '/home/talkad/shared/nadavsc/MPI_GPT3.5_turbo_completion/replaced_context_600.jsonl'
 total_bleu, total_code_bleu, total_code_bert = 0, 0, 0
 
 with open(generation_file, 'r') as f:

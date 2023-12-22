@@ -12,11 +12,10 @@ sys.path.append("../../tokenizer")
 from tokompiler.lexicalization import lexicalize
 
 
-
 def pragma2dict(pragma):
     """
     Convert an openmp pragma into dictionary.
-    do private ( var_501 )  ->   {private,vars: [var_501]}
+    do private ( var_501 )  ->   {private: {vars: [var_501]}}
 
     Assumes legal omp pragmas
     """
@@ -42,22 +41,36 @@ def pragma2dict(pragma):
 
     return result
 
+
+def pragma2str(pragma):
+    '''
+    {private: {vars: [var_501]}} -> do private ( var_501 )
+    '''
+    result = ''
+
+    for clause, inner_clause in pragma.items():
+        if clause == 'private':
+            result += f"private ( {', '.join(inner_clause['vars'])} )"
+        if clause == 'reduction':
+            result += f"reduction ( {inner_clause['operator']} : {', '.inner_clause['vars'])} )"
+
+
 def remove_pragma(code):
     buf = []
 
     for line in code.split('\n'):
         if line.lstrip().startswith('#pragma'):
             continue
-
         buf.append(line)
 
     return '\n'.join(buf)
 
+
 def read_jsonl(file_path):
     with open(file_path, 'r') as f:
         lines = f.readlines()
-    # return [json.loads(line.strip()) for line in lines if 'for' in line]
-    return [json.loads(line.strip()) for line in lines]
+
+    return [json.loads(line.strip()) for line in lines if 'for' in line]
 
 
 def build_omp_dataset(args, rebuild=False):
@@ -111,17 +124,17 @@ def build_omp_dataset(args, rebuild=False):
             if args.is_replaced:
                 code = lexicalize(code, replaced=True)
 
+            pragma = example["pragma"]
+            pragma = pragma2str(pragma2dict(pragma))
+
+            if args.is_replaced:
+                pragma = pragma.replace('_', ' ')
+
             if args.do_eval or args.do_test:
                 code = code
                 example["full"] = code
+                example["label"] = pragma
             else:
-
-                pragma = example["pragma"]
-                pragma = pragma.replace('parallel', '')
-                pragma = pragma.replace('omp', '')
-                pragma = pragma.replace('(', ' ( ').replace(')', ' ) ').replace(':', ' : ').replace(',', ' , ')
-                if args.is_replaced:
-                    pragma = pragma.replace('_', ' ')
 
                 if args.is_replaced:
                     sep_token = '[SEP]'
@@ -133,11 +146,6 @@ def build_omp_dataset(args, rebuild=False):
                 example["full"] = f'{code} {sep_token} parallel {pragma} {eos_token}'
 
             return example
-
-        # JSON fields are:
-        #   hash: an alphanumeric identifier
-        #   code: text of the source code
-        #   pragma: the pragma to predict given the input code
 
         tokenized_dataset = d.map(tokenize_and_parse, batched=False)
 

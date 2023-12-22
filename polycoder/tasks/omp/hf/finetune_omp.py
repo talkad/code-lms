@@ -59,11 +59,8 @@ def finetune(args):
         tokenizer.add_tokens(tokom_extended_tokens)
         tokenizer.enable_padding(length=2048)
     else:
-        tokenizer = AutoTokenizer.from_pretrained("NinedayWang/PolyCoder-2.7B", 
-                                  truncation=True, model_input_names=['input_ids'])
-
-        # tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
-        #                         truncation=True, model_input_names=['input_ids'])
+        tokenizer = GPT2Tokenizer(vocab_file=args.vocab_file, merges_file=args.merge_file, padding=True,
+                                truncation=True, model_input_names=['input_ids'])
         tokenizer.pad_token = tokenizer.eos_token
 
 
@@ -97,8 +94,7 @@ def finetune(args):
 
 
     # MODEL
-    model = AutoModelForCausalLM.from_pretrained("NinedayWang/PolyCoder-2.7B")
-    # model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))        
+    model = GPTNeoXForCausalLM.from_pretrained(os.path.join(args.models_dir, args.model_name))        
     model.train()
 
     # update model embeddings
@@ -118,7 +114,6 @@ def finetune(args):
                                                    num_training_steps=(len(train_loader) * args.num_epochs),)
     
     model.to(args.device)
-    # import pdb; pdb.set_trace()
 
     # TRAIN
     for epoch in range(args.num_epochs):
@@ -142,20 +137,7 @@ def finetune(args):
             if (step > 0) and (step % 10 == 0):
                 logger.info(f'loss: {loss_total / (step+1)}')
                 pbar.set_postfix({"avg_train_loss": loss_total / step})
-
-        # VALIDATION       
-        # val_loss = 0.0
-        # for step_val, batch_val in enumerate(test_loader):
-        #     tensor_batch = {k: v.to(args.device) for k, v in batch_val.items() if k in ['input_ids', 'labels', 'mask', 'attention_mask']}
-
-        #     outputs = model(**tensor_batch)
-        #     loss = outputs.loss 
-        #     val_loss += loss.detach().clone().item()
-        # logger.info(f'val loss:  {val_loss / (step_val+1)}')
                 
-
-        print('save model')
-        model.save_pretrained(os.path.join(args.save_dir, 'original_poly_bpe'), from_pt=True) 
-
-    model.save_pretrained(os.path.join(args.save_dir, 'original_poly_bpe'), from_pt=True) 
+        print(f'save checkpoint {epoch}')
+        model.save_pretrained(os.path.join(args.save_dir, 'compcoder'), from_pt=True) 
 

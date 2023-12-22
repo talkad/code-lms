@@ -123,8 +123,8 @@ def test(args):
     if args.is_replaced:
         post_process = lambda x: concat_vars(x)
     
+
     for batch_idx, batch in enumerate(test_loader):
-        # import pdb; pdb.set_trace()
         tensor_batch = {k: v.to(args.device) for k, v in batch.items() if k in ['input_ids', 'labels', 'mask', 'attention_mask']}
 
         input_ids = tensor_batch['input_ids']
@@ -160,6 +160,6 @@ def test(args):
 
         progress_bar.update(1)
 
-    with open('results/poly_parallel_tokom_results.log', 'w') as f:
+    with open('results/compcoder_results.log', 'w') as f:
         f.write(str(pred_table))
 
